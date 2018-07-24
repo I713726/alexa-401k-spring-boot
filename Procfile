@@ -1,1 +1,1 @@
-web: ./gradle bootrun
+web: ./gradlew bootrun
