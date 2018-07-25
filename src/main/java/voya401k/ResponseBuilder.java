@@ -1,5 +1,10 @@
 package voya401k;
 
 public interface ResponseBuilder {
-    String buildResponse(int questionNo, VoyaIntentType intentType, String locale, VoyaUserDataObject user);
+    /**
+     * Builds a JSON response out of a Voya Response.
+     * @param response
+     * @return
+     */
+    String buildResponse(VoyaResponse response);
 }

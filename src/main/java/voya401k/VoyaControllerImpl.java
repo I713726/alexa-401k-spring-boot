@@ -41,12 +41,12 @@ public class VoyaControllerImpl implements VoyaController{
                 }
             case HELP_REQUEST:
                 if(request.getLocale() =="en-US") {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Welcome to Voya 401k service, you can ask me different things, l" +
                                     "ike Please tell me how my account is doing?", "", false);
                 }
                 else if(request.getLocale() == "es-ES") {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Bienvenido al servicio 401k de Voya, puede preguntarme cosas diferentes, como Por " +
                                     "favor, dígame cómo va mi cuenta.", "", false);
                 }
@@ -55,11 +55,11 @@ public class VoyaControllerImpl implements VoyaController{
                 }
             case CANCEL_REQUEST:
                 if(request.getLocale() =="en-US") {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Ok, thank you for using Voya 401k service, have a nice day!", "", false);
                 }
                 else if(request.getLocale() == "es-ES") {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Ok, gracias por usar el servicio Voya 401k, ¡ten un buen día!", "", false);
                 }
                 else {
@@ -106,14 +106,14 @@ public class VoyaControllerImpl implements VoyaController{
 
     private VoyaResponse handleYes(VoyaRequest request) {
         //TODO: HERE WE ASSUME THAT A PIN OF 0 MEANS NO PIN, NOT SURE HOW THIS WILL ACTUALLY BE ENFORCED
-        if(request.getVoyaPin() == 0) {
+        if(request.getVoyaPIN() == 0) {
             if(request.getLocale().equals("en-US")) {
                 String speech = "OK, go ahead and say your PIN";
-                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(), speech, speech, false);
+                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, speech, false);
             }
             if(request.getLocale().equals("es-ES")) {
                 String speech = "OK, solo di el PIN";
-                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(), speech, speech, false);
+                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, speech, false);
             }
             else {
                 throw new IllegalArgumentException("Unsupported Language!");
@@ -121,23 +121,23 @@ public class VoyaControllerImpl implements VoyaController{
         }
         else {
             if(request.getQuestionNo() == 1) {
-                VoyaUserDataObject userData = this.getUserData(request.getVoyaPin());
+                VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
 
                 if(request.getLocale().equals("en-US")) {
                     String speech =                 "You are doing a great job of saving "
                             + userData.getSavingsRate() + " from your pay." +
-                            " if you increase your savings rate to" + userData.getSavingsRateIncrease() +
+                            " if you increase your savings rate to " + userData.getSavingsRateIncrease() +
                             " you could retire at age " + userData.getLoweredRetirementAge() + ". Would you like to"
                             +" increase your savings rate by "+ userData.getSavingsRateIncrease() + " now?";
 
-                    return new VoyaResponseImpl(2, request.getVoyaPin(),speech, speech, false);
+                    return new VoyaResponseImpl(2, request.getVoyaPIN(),speech, speech, false);
                 }
                 else if(request.getLocale().equals("es-ES")) {
                     String speech = "Está haciendo un gran trabajo ahorrando un" + userData.getSavingsRate() + "de su salario." +
                             " si aumenta su tasa de ahorro al "+ userData.getSavingsRateIncrease() +
                             ", podría jubilarse a los "+ userData.getLoweredRetirementAge() + " años" +
                             "¿Le gustaría aumentar su tasa de ahorro en un " + userData.getSavingsRateIncrease() + " ahora?";
-                    return new VoyaResponseImpl(2, request.getVoyaPin(),speech, speech, false);
+                    return new VoyaResponseImpl(2, request.getVoyaPIN(),speech, speech, false);
                 }
                 else{
                     throw new IllegalArgumentException("Locale not supported!");
@@ -149,11 +149,11 @@ public class VoyaControllerImpl implements VoyaController{
                     String speech = "OK, great. I\'ve done that for you. Congratulations, " +
                             "your future self will thank you!";
 
-                    return new VoyaResponseImpl(0, request.getVoyaPin(), speech, speech, true);
+                    return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, speech, true);
                 }
                 else if(request.getLocale().equals("es-ES")){
                     String speech = "Vale genial. He hecho eso por ti. Felicidades, tu ser futuro te lo agradecerá!";
-                    return new VoyaResponseImpl(0, request.getVoyaPin(), speech, speech, true);
+                    return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, speech, true);
 
                 }
                 else {
@@ -162,11 +162,11 @@ public class VoyaControllerImpl implements VoyaController{
             }
             else {
                 if (request.getLocale().equals("en-US")) {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "I'm sorry?", "I'm Sorry?", false);
                 }
                 else if (request.getLocale().equals("es-ES")) {
-                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(),
+                    return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "I'm sorry?", "I'm Sorry?", false);
                 }
                 else {
@@ -178,14 +178,14 @@ public class VoyaControllerImpl implements VoyaController{
     }
 
     private VoyaResponse handleNo(VoyaRequest request) {
-        if(request.getVoyaPin() == 0) {
+        if(request.getVoyaPIN() == 0) {
             if (request.getLocale().equals("en-US")) {
                 String speech = "OK, have a nice day!";
-                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(), speech, speech, true);
+                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, speech, true);
             }
             if (request.getLocale().equals("es-ES")) {
                 String speech = "¡Bien tenga un buen día!";
-                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPin(), speech, speech, true);
+                return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, speech, true);
             }
             else {
                 throw new IllegalArgumentException("Unsupported Locale!");
@@ -193,19 +193,19 @@ public class VoyaControllerImpl implements VoyaController{
         }
         else {
 
-            VoyaUserDataObject userData = this.getUserData(request.getVoyaPin());
+            VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
 
             if(request.getQuestionNo() == 1) {
                 if (request.getLocale().equals("en-US")) {
                     String speech = "Ok " + userData.getFirstName() +
                             "!, I understand thank you for using Voya 401k service, have a nice day!";
-                    return new VoyaResponseImpl(1, request.getVoyaPin(), speech, speech, true);
+                    return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, true);
                 }
                 else if (request.getLocale().equals("es-ES")) {
                     String speech = "Ok, "
                             + userData.getFirstName()
                             + ", entiendo gracias por usar el servicio Voya 401k, ¡que tengas un buen día!";
-                    return new VoyaResponseImpl(1, request.getVoyaPin(), speech,speech, true);
+                    return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,speech, true);
                 }
                 else {
                     throw new IllegalArgumentException("Unsupported Locale!");
@@ -216,11 +216,11 @@ public class VoyaControllerImpl implements VoyaController{
                 if (request.getLocale().equals("en-US")) {
                     String speech = "Ok, I understand. Would you want to save more in the future? "
                             + "I can sign you up to save 1% more a year from now?";
-                    return new VoyaResponseImpl(3, request.getVoyaPin(), speech, speech, false);
+                    return new VoyaResponseImpl(3, request.getVoyaPIN(), speech, speech, false);
                 }
                 else if (request.getLocale().equals("es-ES")) {
                     String speech = "Vale, entiendo. ¿Te gustaría ahorrar más en el futuro? ¿Puedo inscribirme para ahorrar un 1% más por año a partir de ahora?";
-                    return new VoyaResponseImpl(3, request.getVoyaPin(), speech, speech, false);
+                    return new VoyaResponseImpl(3, request.getVoyaPIN(), speech, speech, false);
                 }
                 else {
                     throw new IllegalArgumentException("Unsupported Locale!");
@@ -231,13 +231,13 @@ public class VoyaControllerImpl implements VoyaController{
                     String speech = "Ok, "
                             + userData.getFirstName()
                             + ",thank you for using Voya 401k service, have a good day!";
-                    return new VoyaResponseImpl(1, request.getVoyaPin(), speech,speech, true);
+                    return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,speech, true);
                 }
                 else if(request.getLocale().equals("es-ES")) {
                     String speech = "Ok, "
                             + userData.getFirstName()
                             + ", entiendo gracias por usar el servicio Voya 401k, ¡que tengas un buen día!";
-                    return new VoyaResponseImpl(1, request.getVoyaPin(), speech,speech, true);
+                    return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,speech, true);
                 }
                 else {
                     throw new IllegalArgumentException("Locale not supported");
@@ -250,19 +250,19 @@ public class VoyaControllerImpl implements VoyaController{
 
     private VoyaResponse handlePin(VoyaRequest request) {
         try{
-            VoyaUserDataObject userData = getUserData(request.getVoyaPin());
+            VoyaUserDataObject userData = getUserData(request.getVoyaPIN());
 
             if(request.getLocale() == "en-US") {
                 String speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
                         + "today?";
-                return new VoyaResponseImpl(1, request.getVoyaPin(), speech, speech, false);
+                return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, false);
             }
             else if(request.getLocale() == "es-ES") {
 
                 String speech = "Hola " + userData.getFirstName()
                         + "! h¿cómo puede ayudarte con tu " + userData.getPlanName() + " hoy?";
 
-                return new VoyaResponseImpl(1, request.getVoyaPin(), speech, speech, false);
+                return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, false);
             }
             else {
                 throw new IllegalArgumentException("Unsupported language");
@@ -301,7 +301,7 @@ public class VoyaControllerImpl implements VoyaController{
 
     private VoyaResponse handleSummary(VoyaRequest request) {
 
-        VoyaUserDataObject userData = this.getUserData(request.getVoyaPin());
+        VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
         //TODO: Find some way to get the date
         String dateVal = "";
         if (request.getLocale() == "en-US") {
@@ -315,7 +315,7 @@ public class VoyaControllerImpl implements VoyaController{
                     + userData.getProjectedRetirementAge()
                     + ". Would you like to hear suggestions to be able retire a little sooner?";
 
-            return new VoyaResponseImpl(1, request.getVoyaPin(), speech,
+            return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,
                     "would you like to hear suggestions to be able to retire a little sooner?",
                     false);
         }
@@ -328,7 +328,7 @@ public class VoyaControllerImpl implements VoyaController{
                     "para jubilarse a los "
                     + userData.getProjectedRetirementAge()
                     + " años. ¿Le gustaría recibir sugerencias para poder jubilarse un poco antes?";
-            return new VoyaResponseImpl(1, request.getVoyaPin(), speech,
+            return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,
                     "¿Le gustaría escuchar sugerencias para poder retirarse un poco antes?",
                     false);
         }
