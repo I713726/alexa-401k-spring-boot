@@ -8,8 +8,9 @@ public interface VoyaUserDataObject {
     //All of these values would have to be retrieved from the database
     String getFirstName();
     String getLastName();
-    int getAccoutBalance();
+    int getAccountBalance();
     String getLastUpdatedDate();
+    String getPlanName();
     double getRateOfReturn();
     int getProjectedRetirementAge();
     double getSavingsRate();

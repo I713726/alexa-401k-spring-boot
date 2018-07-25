@@ -9,7 +9,7 @@ public class VoyaResponseImpl implements VoyaResponse {
     int userPIN;
     String speech;
     String reprompt;
-    boolean shouldSessionEnd
+    boolean shouldSessionEnd;
 
     public VoyaResponseImpl(int questionNumber, int userPIN, String speech, String reprompt, boolean shouldSessionEnd) {
         this.questionNumber = questionNumber;
@@ -22,7 +22,7 @@ public class VoyaResponseImpl implements VoyaResponse {
 
     @Override
     public int getQuestionNumber() {
-        return this.questionNumber
+        return this.questionNumber;
     }
 
     @Override
@@ -42,6 +42,6 @@ public class VoyaResponseImpl implements VoyaResponse {
 
     @Override
     public boolean getShouldSessionEnd() {
-        return this.shouldSessionEnd    ;
+        return this.shouldSessionEnd;
     }
 }
