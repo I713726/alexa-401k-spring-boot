@@ -20,32 +20,32 @@ public class VoyaControllerImpl implements VoyaController{
             case INTENT_REQUEST:
                 return this.handleIntentRequest(request);
             case SESSION_END_REQUEST:
-                if(request.getLocale() =="en-US") {
+                if(request.getLocale().equals("en-US")) {
                     return new VoyaResponseImpl(0, 0, "Have a nice day!", "", true);
                 }
-                else if(request.getLocale() == "es-ES") {
+                else if(request.getLocale().equals("es-ES")) {
                     return new VoyaResponseImpl(0, 0, "bien tenga un buen día", "", true);
                 }
                 else {
                     throw new IllegalArgumentException("Locale not supported!");
                 }
             case STOP_REQUEST:
-                if(request.getLocale() =="en-US") {
+                if(request.getLocale().equals("en-US")) {
                     return new VoyaResponseImpl(0, 0, " ", "", true);
                 }
-                else if(request.getLocale() == "es-ES") {
+                else if(request.getLocale().equals("es-ES")) {
                     return new VoyaResponseImpl(0, 0, "", "", true);
                 }
                 else {
                     throw new IllegalArgumentException("Locale not supported!");
                 }
             case HELP_REQUEST:
-                if(request.getLocale() =="en-US") {
+                if(request.getLocale().equals("en-US")) {
                     return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Welcome to Voya 401k service, you can ask me different things, l" +
                                     "ike Please tell me how my account is doing?", "", false);
                 }
-                else if(request.getLocale() == "es-ES") {
+                else if(request.getLocale().equals("es-ES")) {
                     return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Bienvenido al servicio 401k de Voya, puede preguntarme cosas diferentes, como Por " +
                                     "favor, dígame cómo va mi cuenta.", "", false);
@@ -54,11 +54,11 @@ public class VoyaControllerImpl implements VoyaController{
                     throw new IllegalArgumentException("Locale not supported!");
                 }
             case CANCEL_REQUEST:
-                if(request.getLocale() =="en-US") {
+                if(request.getLocale().equals("en-US")) {
                     return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Ok, thank you for using Voya 401k service, have a nice day!", "", false);
                 }
-                else if(request.getLocale() == "es-ES") {
+                else if(request.getLocale().equals("es-ES")) {
                     return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                             "Ok, gracias por usar el servicio Voya 401k, ¡ten un buen día!", "", false);
                 }
@@ -72,12 +72,12 @@ public class VoyaControllerImpl implements VoyaController{
     }
 
     private VoyaResponse handleLaunchRequest(VoyaRequest request) {
-        if(request.getLocale() == "en-US") {
+        if(request.getLocale().equals("en-US")) {
             return new VoyaResponseImpl(0, 0, "Hi, Welcome to Voya 401K service. To get " +
                     "started please say your PIN",
                     "To get started, please say the PIN you set up to enable the skill", false);
         }
-        else if(request.getLocale() == "es-ES") {
+        else if(request.getLocale().equals("es-ES")) {
             return new VoyaResponseImpl(0, 0, "Bienvenido al servicio Voya 401k, " +
                     "para comenzar, ¿dices el PIN de cuatro dígitos que configuraste para habilitar la habilidad?",
                     "para comenzar, por favor diga su pin", false);
@@ -252,12 +252,12 @@ public class VoyaControllerImpl implements VoyaController{
         try{
             VoyaUserDataObject userData = getUserData(request.getVoyaPIN());
 
-            if(request.getLocale() == "en-US") {
+            if(request.getLocale().equals("en-US")) {
                 String speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
                         + "today?";
                 return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, false);
             }
-            else if(request.getLocale() == "es-ES") {
+            else if(request.getLocale().equals("es-ES")) {
 
                 String speech = "Hola " + userData.getFirstName()
                         + "! h¿cómo puede ayudarte con tu " + userData.getPlanName() + " hoy?";
@@ -268,12 +268,12 @@ public class VoyaControllerImpl implements VoyaController{
                 throw new IllegalArgumentException("Unsupported language");
             }
         } catch(IllegalArgumentException e) {
-            if(request.getLocale() == "en-US") {
+            if(request.getLocale().equals("en-US")) {
                 String speech = "Sorry, that's not a valid pin";
                 //TODO: Figure out if session ends with an invalid pin.
                 return new VoyaResponseImpl(0, 0, speech, speech, false);
             }
-            else if (request.getLocale() == "es-ES") {
+            else if (request.getLocale().equals("es-ES")) {
                 String speech = "lo siento, ese no es un pin válido";
                 return new VoyaResponseImpl(0, 0, speech, speech, false);
             }
@@ -284,13 +284,13 @@ public class VoyaControllerImpl implements VoyaController{
     }
 
     private  VoyaResponse handleQuit(VoyaRequest request) {
-        if (request.getLocale() == "en-US") {
+        if (request.getLocale().equals("en-US")) {
             return new VoyaResponseImpl(0, 0,
                     "OK, have a nice day!",
                     null,
                     false);
         }
-        else if (request.getLocale() == "es-ES") {
+        else if (request.getLocale().equals("es-ES")) {
             return new VoyaResponseImpl(0, 0,
                     "¡Bien tenga un buen día!",null,true);
         }
@@ -304,7 +304,7 @@ public class VoyaControllerImpl implements VoyaController{
         VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
         //TODO: Find some way to get the date
         String dateVal = "";
-        if (request.getLocale() == "en-US") {
+        if (request.getLocale().equals("en-US")) {
 
             String speech = "Sure "
                     + userData.getFirstName() + ", As of "+ dateVal +", your account balance is "
@@ -319,7 +319,7 @@ public class VoyaControllerImpl implements VoyaController{
                     "would you like to hear suggestions to be able to retire a little sooner?",
                     false);
         }
-        else if(request.getLocale() == "es-ES") {
+        else if(request.getLocale().equals("es-ES")) {
             String speech = "Por supuesto "+ userData.getFirstName() + ", a partir del " + dateVal
                     + " el saldo de su cuenta es de " + userData.getAccountBalance()
                     + ". Su tasa de rendimiento de los últimos 12 meses es del "

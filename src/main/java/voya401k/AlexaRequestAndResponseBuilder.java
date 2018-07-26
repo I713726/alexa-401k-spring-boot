@@ -8,7 +8,6 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
 
     @Override
     public VoyaRequest buildRequest(String jsonData) {
-        //TODO: What if the elements don't exist yet?
         JSONObject jsonObject = new JSONObject(jsonData);
         int questionNo;
         int voyaPIN;
@@ -20,12 +19,6 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             questionNo = 0;
         }
 
-        try {
-            voyaPIN = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("voyaPIN"));
-        }
-        catch(JSONException e) {
-            voyaPIN = 0;
-        }
         try{
             intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
         }
@@ -33,7 +26,25 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             //TODO: When the request isn't an intent, should probably do something better than this
             intentType = null;
         }
-
+        if(intentType == VoyaIntentType.PIN) {
+            try {
+                voyaPIN = Integer.parseInt(
+                        jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots")
+                                .getJSONObject("pin").getString("value")
+                );
+            }
+            catch(JSONException e) {
+                throw new IllegalArgumentException("No PIN in PIN intent!");
+            }
+       }
+        else {
+            try {
+                voyaPIN = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("voyaPin"));
+            }
+            catch(JSONException e) {
+                voyaPIN = 0;
+            }
+        }
 
         VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
         String locale = jsonObject.getJSONObject("request").getString("locale");
@@ -42,17 +53,16 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     }
 
     @Override
-    public String buildRespose(VoyaResponse response) {
+    public String buildResponse(VoyaResponse response) {
         JSONObject outJson = new JSONObject();
         outJson.put("version", 1.0);
+        outJson.put("response", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
+                .put("ssml", "<speak>" + response.getSpeech() +"</speak>")));
+        outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
+                new JSONObject().put("type", "SSML").put("ssml", "<speak>" + response.getReprompt() + "</speak>")));
+        outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
                 .put("voyaPin", response.getUserPIN()));
-        outJson.put("response", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
-                .put("ssml", response.getSpeech())));
-        outJson.put("reprompt", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
-                .put("ssml", response.getReprompt())));
-        outJson.put("shouldEndSession", response.getShouldSessionEnd());
-
         return outJson.toString();
     }
 

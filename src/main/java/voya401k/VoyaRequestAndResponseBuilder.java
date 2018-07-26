@@ -16,5 +16,5 @@ public interface VoyaRequestAndResponseBuilder {
      * @param response
      * @return
      */
-    String buildRespose(VoyaResponse response);
+    String buildResponse(VoyaResponse response);
 }
