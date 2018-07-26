@@ -1,14 +1,13 @@
 package voya401k;
 
-import java.util.Map;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBuilder{
 
+
     @Override
-    public VoyaRequest build(String jsonData) {
+    public VoyaRequest buildRequest(String jsonData) {
         //TODO: What if the elements don't exist yet?
         JSONObject jsonObject = new JSONObject(jsonData);
         int questionNo;
@@ -43,7 +42,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     }
 
     @Override
-    public String buildJSON(VoyaResponse response) {
+    public String buildRespose(VoyaResponse response) {
         JSONObject outJson = new JSONObject();
         outJson.put("version", 1.0);
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())

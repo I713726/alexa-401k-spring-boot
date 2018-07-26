@@ -1,12 +1,11 @@
 package voya401k;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class GreetingController {
+public class WebController {
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
@@ -15,12 +14,10 @@ public class GreetingController {
     @RequestMapping(value = "/voya401k", method = RequestMethod.POST)
     @ResponseBody
     public String process(@RequestBody String payload) throws Exception {
-        //TODO: send map to be processed
-        //System.out.println(payload);
         AlexaRequestAndResponseBuilder builder = new AlexaRequestAndResponseBuilder();
-        VoyaRequest request = builder.build(payload);
+        VoyaRequest request = builder.buildRequest(payload);
         VoyaResponse response = new VoyaControllerImpl().getResponse(request);
-        String jsonResponse = builder.buildJSON(response);
+        String jsonResponse = builder.buildRespose(response);
         return jsonResponse;
     }
 }
