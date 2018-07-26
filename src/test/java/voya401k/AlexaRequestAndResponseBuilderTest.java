@@ -164,7 +164,7 @@ public class AlexaRequestAndResponseBuilderTest {
     public void testCreateResponse() {
         VoyaResponse response = new VoyaResponseImpl(1, 1111, "hi ther", "", false);
 
-        String expectedJSON = "{\"response\":{\"shouldEndSession\":false,\"reprompt\":{\"outputSpeech\":{\"ssml\":\"\",\"type\":\"SSML\"}},\"outputSpeech\":{\"ssml\":\"hi ther\",\"type\":\"SSML\"}},\"sessionAttributes\":{\"questionNo\":1,\"voyaPin\":1111},\"version\":1}";
+        String expectedJSON = "{\"response\":{\"shouldEndSession\":false,\"reprompt\":{\"outputSpeech\":{\"ssml\":\"&lt;speak&gt;&lt;/speak&gt;\",\"type\":\"SSML\"}},\"outputSpeech\":{\"ssml\":\"&lt;speak&gt;hi ther&lt;/speak&gt;\",\"type\":\"SSML\"}},\"sessionAttributes\":{\"questionNo\":1,\"voyaPin\":1111},\"version\":1}";
 
         AlexaRequestAndResponseBuilder builder = new AlexaRequestAndResponseBuilder();
 
