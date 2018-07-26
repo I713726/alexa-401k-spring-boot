@@ -1,23 +1,60 @@
 package voya401k;
 
 import java.util.Map;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBuilder{
 
     @Override
     public VoyaRequest build(String jsonData) {
+        //TODO: What if the elements don't exist yet?
         JSONObject jsonObject = new JSONObject(jsonData);
-        int questionNo = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("questionNo"));
-        int voyaPIN = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("voyaPIN"));
+        int questionNo;
+        int voyaPIN;
+        VoyaIntentType intentType;
+        try{
+            questionNo = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("questionNo"));
+        }
+        catch(JSONException e) {
+            questionNo = 0;
+        }
+
+        try {
+            voyaPIN = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("voyaPIN"));
+        }
+        catch(JSONException e) {
+            voyaPIN = 0;
+        }
+        try{
+            intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
+        }
+        catch(JSONException e) {
+            //TODO: When the request isn't an intent, should probably do something better than this
+            intentType = null;
+        }
+
+
         VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
         String locale = jsonObject.getJSONObject("request").getString("locale");
-        VoyaIntentType intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
+
+        return new VoyaRequestImpl(questionNo, voyaPIN, requestType, locale, intentType);
     }
 
     @Override
     public String buildJSON(VoyaResponse response) {
+        JSONObject outJson = new JSONObject();
+        outJson.put("version", 1.0);
+        outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
+                .put("voyaPin", response.getUserPIN()));
+        outJson.put("response", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
+                .put("ssml", response.getSpeech())));
+        outJson.put("reprompt", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
+                .put("ssml", response.getReprompt())));
+        outJson.put("shouldEndSession", response.getShouldSessionEnd());
 
+        return outJson.toString();
     }
 
     private VoyaRequestType getRequestType(String requestType) {
@@ -33,7 +70,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaRequestType.SESSION_END_REQUEST;
             case "StopRequest":
                 return VoyaRequestType.STOP_REQUEST;
-            case "CancelRequest":
+            default:
                 return VoyaRequestType.CANCEL_REQUEST;
         }
     }
@@ -48,7 +85,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.PIN;
             case "VoyaYesIntent":
                 return VoyaIntentType.YES;
-            case "VoyaQuitIntent":
+            default:
                 return VoyaIntentType.QUIT;
         }
     }
