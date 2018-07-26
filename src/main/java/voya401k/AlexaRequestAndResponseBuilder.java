@@ -57,9 +57,10 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         JSONObject outJson = new JSONObject();
         outJson.put("version", 1.0);
         outJson.put("response", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
-                .put("ssml", "&lt;speak&gt;" + response.getSpeech() +"&lt;/speak&gt;")));
+                .put("ssml", "<speak>" + response.getSpeech() + "</speak>")));
+        //TODO: JSON ESCAPES FORWARD SLASHES BY DEFAULT! THIS CAUSES PROBLEMS FOR ALEXA WHEN THEY RECIEVE THE JSON
         outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
-                new JSONObject().put("type", "SSML").put("ssml", "&lt;speak&gt;" + response.getReprompt() + "&lt;/speak&gt;")));
+                new JSONObject().put("type", "SSML").put("ssml", ("<speak>" + response.getReprompt() + "</speak>"))));
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
                 .put("voyaPin", response.getUserPIN()));
