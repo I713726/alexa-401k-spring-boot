@@ -339,6 +339,9 @@ public class VoyaControllerImpl implements VoyaController{
 
     private VoyaUserDataObject getUserData(int pin) throws IllegalArgumentException {
         //TODO: Comlete Implementation, this is dummy implementation for testing
+        if(pin == 0) {
+            throw new IllegalArgumentException("Not a valid pin!");
+        }
         return new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
                 .12, .04);
     }

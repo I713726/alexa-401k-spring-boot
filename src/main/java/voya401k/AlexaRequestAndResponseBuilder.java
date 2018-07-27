@@ -37,6 +37,9 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             catch(JSONException e) {
                 throw new IllegalArgumentException("No PIN in PIN intent!");
             }
+            catch(NumberFormatException e) {
+                voyaPIN = 0;
+            }
        }
         else {
             try {
