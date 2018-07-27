@@ -255,14 +255,14 @@ public class VoyaControllerImpl implements VoyaController{
             if(request.getLocale().equals("en-US")) {
                 String speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
                         + "today?";
-                return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, false);
+                return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, speech, false);
             }
             else if(request.getLocale().equals("es-ES")) {
 
                 String speech = "Hola " + userData.getFirstName()
                         + "! h¿cómo puede ayudarte con tu " + userData.getPlanName() + " hoy?";
 
-                return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, false);
+                return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, speech, false);
             }
             else {
                 throw new IllegalArgumentException("Unsupported language");
