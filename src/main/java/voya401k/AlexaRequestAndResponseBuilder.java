@@ -2,6 +2,7 @@ package voya401k;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.fasterxml.jackson.core.io.JsonStringEncoder;
 
 public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBuilder{
 
@@ -55,10 +56,10 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     @Override
     public String buildResponse(VoyaResponse response) {
         JSONObject outJson = new JSONObject();
+        JsonStringEncoder encoder = new JsonStringEncoder();
         outJson.put("version", 1.0);
         outJson.put("response", new JSONObject().put("outputSpeech", new JSONObject().put("type", "SSML")
                 .put("ssml", "<speak>" + response.getSpeech() + "</speak>")));
-        //TODO: JSON ESCAPES FORWARD SLASHES BY DEFAULT! THIS CAUSES PROBLEMS FOR ALEXA WHEN THEY RECIEVE THE JSON
         outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
                 new JSONObject().put("type", "SSML").put("ssml", ("<speak>" + response.getReprompt() + "</speak>"))));
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());

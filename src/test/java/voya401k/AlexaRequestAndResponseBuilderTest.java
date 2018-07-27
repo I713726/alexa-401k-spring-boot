@@ -164,12 +164,12 @@ public class AlexaRequestAndResponseBuilderTest {
     public void testCreateResponse() {
         VoyaResponse response = new VoyaResponseImpl(1, 1111, "hi ther", "", false);
 
-        String expectedJSON = "{\"response\":{\"shouldEndSession\":false,\"reprompt\":{\"outputSpeech\":{\"ssml\":\"<speak></speak>\",\"type\":\"SSML\"}},\"outputSpeech\":{\"ssml\":\"<speak>hi ther</speak>\",\"type\":\"SSML\"}},\"sessionAttributes\":{\"questionNo\":1,\"voyaPin\":1111},\"version\":1}";
+        String expectedJSON = "{\"response\":{\"shouldEndSession\":false,\"reprompt\":{\"outputSpeech\":{\"ssml\":\"<speak><\\/speak>\",\"type\":\"SSML\"}},\"outputSpeech\":{\"ssml\":\"<speak>hi ther<\\/speak>\",\"type\":\"SSML\"}},\"sessionAttributes\":{\"questionNo\":1,\"voyaPin\":1111},\"version\":1}";
         System.out.println("</speak>");
         System.out.println(" fuck" + "</speak>");
         AlexaRequestAndResponseBuilder builder = new AlexaRequestAndResponseBuilder();
         System.out.println("<speak>" + response.getSpeech() + "</speak>");
         System.out.println(builder.buildResponse(response));
-        //Assert.assertEquals(true, builder.buildResponse(response).equals(expectedJSON));
+        Assert.assertEquals(true, builder.buildResponse(response).equals(expectedJSON));
     }
 }
