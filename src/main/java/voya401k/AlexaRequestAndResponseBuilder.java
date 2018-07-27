@@ -40,7 +40,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
        }
         else {
             try {
-                voyaPIN = Integer.parseInt(jsonObject.getJSONObject("session").getJSONObject("attributes").getString("voyaPin"));
+                voyaPIN = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("voyaPin");
             }
             catch(JSONException e) {
                 voyaPIN = 0;
