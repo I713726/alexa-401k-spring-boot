@@ -21,7 +21,7 @@ public class VoyaResponseTextTranslator {
      * Sends text to translate to Microsoft Translate
      * @param text text to translate
      * @param locale code for locale, taken from <a href =https://developer.amazon.com/docs/custom-skills/develop-skills-in-multiple-languages.html>here</a>
-     * @return
+     * @return translated text
      */
     public String translate(String text, String locale) {
         String langParam;

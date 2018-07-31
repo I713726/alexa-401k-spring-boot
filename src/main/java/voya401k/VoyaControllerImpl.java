@@ -7,13 +7,6 @@ package voya401k;
  * request.
  */
 public class VoyaControllerImpl implements VoyaController{
-
-    /**
-     * Returns the appropriate response for the given request. Right now, it just returns one response, but optimally
-     * in the future it would have several responses to choose from.
-     * @param request
-     * @return
-     */
     @Override
     public VoyaResponse getResponse(VoyaRequest request) {
         String speech;
