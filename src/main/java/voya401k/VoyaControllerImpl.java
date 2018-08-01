@@ -1,24 +1,33 @@
 package voya401k;
-
-
+import java.util.ArrayList;
 
 /**
  * Implementation of the VoyaController class. This class uses the method getResponse to appropriately answer every
  * request.
  */
 public class VoyaControllerImpl implements VoyaController{
+
+    VoyaResponseTranslator translator;
+    ArrayList<ArrayList<String>> responses;
+    ArrayList<ArrayList<String>> reprompts;
+
+    VoyaControllerImpl() {
+        this.initializeResponses();
+        this.intializeRepropmts();
+        this.translator = new MicrosoftTranslator();
+    }
+
     @Override
     public VoyaResponse getResponse(VoyaRequest request) {
         String speech;
         String reprompt;
         switch(request.getRequestType()) {
             case LAUNCH_REQUEST:
-
-                speech = "Hi, Welcome to Voya 401K service. To get started please say your PIN";
-                reprompt = "To get started, please say the PIN you set up to enable the skill";
+                speech = this.getResponse(0);
+                reprompt = this.getReprompt(0);
                 if(! request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
-                    reprompt = new VoyaResponseTextTranslator().translate(reprompt, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
+                    reprompt = translator.translate(reprompt, request.getLocale());
                 }
                 return new VoyaResponseImpl(0, 0, speech,reprompt, false);
             case INTENT_REQUEST:
@@ -26,7 +35,7 @@ public class VoyaControllerImpl implements VoyaController{
             case SESSION_END_REQUEST:
                 speech = "Have a nice day!";
                 if(! request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(0, 0, "Have a nice day!", "", true);
 
@@ -35,13 +44,13 @@ public class VoyaControllerImpl implements VoyaController{
             case HELP_REQUEST:
                 speech = "Welcome to Voya 401k service, you can ask me different things, like Please tell me how my account is doing?";
                 if(! request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, "", false);
             case CANCEL_REQUEST:
                 speech = "Ok, thank you for using Voya 401k service, have a nice day!";
                 if(! request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, "", false);
             default:
@@ -74,7 +83,7 @@ public class VoyaControllerImpl implements VoyaController{
         if(request.getVoyaPIN() == 0) {
             speech = "OK, go ahead and say your PIN";
             if(!request.getLocale().startsWith("en-US")) {
-                speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                speech = translator.translate(speech, request.getLocale());
             }
             return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, speech, false);
         }
@@ -89,22 +98,22 @@ public class VoyaControllerImpl implements VoyaController{
                         + " now?";
 
                 if(! request.getLocale().startsWith("en-US")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
-                    reprompt = new VoyaResponseTextTranslator().translate(reprompt, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
+                    reprompt = translator.translate(reprompt, request.getLocale());
                 }
                 return new VoyaResponseImpl(2, request.getVoyaPIN(),speech, reprompt, false);
             }
             else if(request.getQuestionNo() == 2 || request.getQuestionNo() == 3) {
                 speech = "OK, great. I\'ve done that for you. Congratulations, your future self will thank you!";
                 if(! request.getLocale().startsWith("en-US")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, "", true);
             }
             else {
                 speech = "I'm sorry?";
                 if (! request.getLocale().startsWith("en-US")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(),
                         speech, speech, false);
@@ -119,7 +128,7 @@ public class VoyaControllerImpl implements VoyaController{
         if(request.getVoyaPIN() == 0) {
             speech = "Ok, have a nice day!";
             if (! request.getLocale().startsWith("en")) {
-                speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                speech = translator.translate(speech, request.getLocale());
             }
             return new VoyaResponseImpl(request.getQuestionNo(), request.getVoyaPIN(), speech, "", true);
         }
@@ -130,7 +139,7 @@ public class VoyaControllerImpl implements VoyaController{
                     "!, I understand thank you for using Voya 401k service, have a nice day!";
             if(request.getQuestionNo() == 1) {
                 if (!request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, speech, true);
             }
@@ -139,15 +148,15 @@ public class VoyaControllerImpl implements VoyaController{
                         + "I can sign you up to save 1% more a year from now?";
                 reprompt = "Would you like to sign up to save 1% a year from now?";
                 if (!request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
-                    reprompt = new VoyaResponseTextTranslator().translate(reprompt, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
+                    reprompt = translator.translate(reprompt, request.getLocale());
                 }
                 return new VoyaResponseImpl(3, request.getVoyaPIN(), speech, reprompt, false);
             }
             else {
                 speech = "Ok, " + userData.getFirstName() + ",thank you for using Voya 401k service, have a good day!";
                 if(!request.getLocale().startsWith("en")) {
-                    speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                    speech = translator.translate(speech, request.getLocale());
                 }
                 return new VoyaResponseImpl(1, request.getVoyaPIN(), speech,"", true);
 
@@ -167,14 +176,14 @@ public class VoyaControllerImpl implements VoyaController{
                     + "today?";
 
             if(!request.getLocale().startsWith("en")) {
-                speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                speech = translator.translate(speech, request.getLocale());
             }
             return new VoyaResponseImpl(0, request.getVoyaPIN(), speech, speech, false);
 
         } catch(IllegalArgumentException e) {
             speech = "Sorry, that's not a valid pin";
             if(request.getLocale().equals("en-US")) {
-                speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+                speech = translator.translate(speech, request.getLocale());
             }
             //TODO: Figure out if session ends with an invalid pin.
             return new VoyaResponseImpl(0, 0, speech, speech, false);
@@ -185,7 +194,7 @@ public class VoyaControllerImpl implements VoyaController{
     private  VoyaResponse handleQuit(VoyaRequest request) {
         String speech = "Ok, have a nice day!";
         if (!request.getLocale().startsWith("en-US")) {
-            speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
+            speech = translator.translate(speech, request.getLocale());
         }
         return new VoyaResponseImpl(0, 0, speech,null,false);
     }
@@ -193,11 +202,9 @@ public class VoyaControllerImpl implements VoyaController{
     private VoyaResponse handleSummary(VoyaRequest request) {
 
         VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
-        //TODO: Find some way to get the date
-        String dateVal = "";
 
         String speech = "Sure "
-                + userData.getFirstName() + ", As of " + dateVal + ", your account balance is "
+                + userData.getFirstName() + ", As of " + userData.getLastUpdatedDate() + ", your account balance is "
                 + userData.getAccountBalance() + ". Your rate of return for the past 12 months is "
                 + userData.getRateOfReturn() + ", which is above the average portfolio benchmark for this period."
                 + " Nice job making your money work for you! It looks like you are currently projected to have "
@@ -208,8 +215,8 @@ public class VoyaControllerImpl implements VoyaController{
 
         if(! request.getLocale().startsWith("en")) {
             //TODO: Maybe enforce proper locale strings?
-            speech = new VoyaResponseTextTranslator().translate(speech, request.getLocale());
-            reprompt = new VoyaResponseTextTranslator().translate(reprompt, request.getLocale());
+            speech = translator.translate(speech, request.getLocale());
+            reprompt = translator.translate(reprompt, request.getLocale());
         }
         return new VoyaResponseImpl(1, request.getVoyaPIN(), speech, reprompt, false);
     }
@@ -221,5 +228,47 @@ public class VoyaControllerImpl implements VoyaController{
         }
         return new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
                 .12, .04);
+    }
+
+
+    private void initializeResponses() {
+        this.responses = new ArrayList<ArrayList<String>>();
+
+        ArrayList<String> launchGreetings = new ArrayList<String>();
+        launchGreetings.add("Hi, Welcome to Voya 401k service! To get started, please say your 4 digit PIN");
+        launchGreetings.add("Welcome to Voya 401k service! Please say your 4 digit PIN to get started");
+        this.responses.add(launchGreetings);
+
+
+        ArrayList<String> goodByes = new ArrayList<>();
+
+        goodByes.add("Have a nice day!");
+        goodByes.add("Have a good day!");
+        goodByes.add("Have a great day!");
+        goodByes.add("OK, goodbye!");
+
+        ArrayList<String> thankYouGoodBye = new ArrayList<>();
+
+        ArrayList<String> IUnderstandGoodbye = new ArrayList<>();
+
+
+    }
+
+    private void intializeRepropmts() {
+        this.reprompts = new ArrayList<ArrayList<String>>();
+
+        ArrayList<String> launchReprompts = new ArrayList<String>();
+        launchReprompts.add("Please say the PIN you set up when enabling the skill");
+        launchReprompts.add("Please say your 4 digit PIN");
+
+        this.reprompts.add(launchReprompts);
+    }
+
+    private String getResponse(int i) {
+        return this.responses.get(i).get((int)(Math.random() * responses.get(i).size()));
+    }
+
+    private String getReprompt(int i) {
+        return this.reprompts.get(i).get((int)(Math.random() * reprompts.get(i).size()));
     }
 }

@@ -15,7 +15,7 @@ import java.net.URL;
  * This is class is a function object that uses Microsoft's translation API to translate input text into the desired
  * language.
  */
-public class VoyaResponseTextTranslator {
+public class MicrosoftTranslator implements VoyaResponseTranslator {
 
     /**
      * Sends text to translate to Microsoft Translate

@@ -1,5 +1,6 @@
 package voya401k;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -65,6 +66,11 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 .put("ssml", "<speak>" + response.getSpeech() + "</speak>")));
         outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
                 new JSONObject().put("type", "SSML").put("ssml", ("<speak>" + response.getReprompt() + "</speak>"))));
+        /*
+        outJson.getJSONObject("response").put("directives", new JSONArray().put(
+                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://youtu.be/XFJRJPY7Z_A")
+                .put("metadata", new JSONObject().put("title", "retirement day video").put("subtitle", "subtitle")))));
+                */
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
                 .put("voyaPin", response.getUserPIN()));
