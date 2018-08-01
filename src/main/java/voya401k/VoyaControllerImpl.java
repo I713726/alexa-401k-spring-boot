@@ -61,8 +61,8 @@ public class VoyaControllerImpl implements VoyaController{
                 shouldSessionEnd = true;
                 break;
             default:
-                //TODO: Make this make more sense
-                throw new IllegalArgumentException("Request not recognized");
+            return new VoyaResponseImpl(0, 0,
+                    "The skill could not understand your request", "", true);
         }
         if(! request.getLocale().startsWith("en")) {
             speech = translator.translate(speech, request.getLocale());
@@ -122,12 +122,12 @@ public class VoyaControllerImpl implements VoyaController{
                 else {
                     if(request.getQuestionNo() == 1) {
                         VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
-                        speech = "You are doing a great job of saving " + userData.getSavingsRate() + " from your pay." +
-                                " if you increase your savings rate to " + userData.getSavingsRateIncrease() +
-                                " you could retire at age " + userData.getLoweredRetirementAge() + ". Would you like to"
-                                +" increase your savings rate by "+ userData.getSavingsRateIncrease() + " now?";
-                        reprompt = "Would you like to increase your savings rate by " + userData.getSavingsRateIncrease()
-                                + " now?";
+                        speech = "You are doing a great job of saving " + (int) (userData.getSavingsRate() * 100) + " percent from your pay." +
+                                " if you increase your savings rate to " + (int)(100 * (userData.getSavingsRateIncrease() + userData.getSavingsRate())) +
+                                " percent you could retire at age " +userData.getLoweredRetirementAge() + ". Would you like to"
+                                +" increase your savings rate by "+ (int) (100 * userData.getSavingsRateIncrease()) + " percent now?";
+                        reprompt = "Would you like to increase your savings rate by " + (int)(userData.getSavingsRateIncrease() * 100)
+                                + "percent now?";
                         questionNo = 2;
                         userPin = request.getVoyaPIN();
                         shouldSessionEnd = false;
@@ -178,7 +178,7 @@ public class VoyaControllerImpl implements VoyaController{
                 speech = "Sure "
                         + userData.getFirstName() + ", As of " + userData.getLastUpdatedDate() + ", your account balance is "
                         + userData.getAccountBalance() + ". Your rate of return for the past 12 months is "
-                        + userData.getRateOfReturn() + ", which is above the average portfolio benchmark for this period."
+                        + (int)(userData.getRateOfReturn() * 100) + " percent, which is above the average portfolio benchmark for this period."
                         + " Nice job making your money work for you! It looks like you are currently projected to have "
                         + "enough money to retire at age "
                         + userData.getProjectedRetirementAge()

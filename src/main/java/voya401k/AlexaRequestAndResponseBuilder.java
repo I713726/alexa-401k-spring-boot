@@ -1,6 +1,5 @@
 package voya401k;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -25,7 +24,6 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
         }
         catch(JSONException e) {
-            //TODO: When the request isn't an intent, should probably do something better than this
             intentType = null;
         }
         if(intentType == VoyaIntentType.PIN) {
@@ -78,7 +76,6 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     }
 
     private VoyaRequestType getRequestType(String requestType) {
-        //TODO: MAKE SURE THESE STRINGS ARE RIGHT, I'M NOT SURE HOW BUT CHECK
         switch(requestType) {
             case "LaunchRequest":
                 return VoyaRequestType.LAUNCH_REQUEST;

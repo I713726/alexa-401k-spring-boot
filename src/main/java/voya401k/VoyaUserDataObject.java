@@ -5,8 +5,6 @@ variable in the javascript file.
  **/
 
 public interface VoyaUserDataObject {
-    //All of these values would have to be retrieved from the database
-
     /**
      * Returns the first name of the user.
      * @return first name of the user
@@ -54,8 +52,6 @@ public interface VoyaUserDataObject {
      * @return current savings rate
      */
     double getSavingsRate();
-
-    //These values could either be retrieved or calcualted
 
     /**
      * Returns the recommended savings rate increase for this user.
