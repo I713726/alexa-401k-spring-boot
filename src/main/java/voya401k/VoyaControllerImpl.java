@@ -187,6 +187,38 @@ public class VoyaControllerImpl implements VoyaController{
                 questionNo = 1;
                 userPin = request.getVoyaPIN();
                 shouldSessionEnd = false;
+                break;
+            case BALANCE:
+                userData = this.getUserData(request.getVoyaPIN());
+
+                speech = "Your account balance is currently" + userData.getAccountBalance() +
+                        ". Would you like to hear suggestions to retire sooner?";
+                questionNo = 1;
+                userPin = request.getVoyaPIN();
+                shouldSessionEnd = false;
+                break;
+            case SAVINGSRATE:
+                userData = this.getUserData(request.getVoyaPIN());
+                speech = "Sure, your current savings rate is " + userData.getSavingsRate() + ". If you like, I can increase your savings rate by 2% to allow you to retire sooner";
+                questionNo = 2;
+                shouldSessionEnd =false;
+                userPin = request.getVoyaPIN();
+                break;
+            case RATEOFRETURN:
+                userData = this.getUserData(request.getVoyaPIN());
+                speech = "Your rate of return for the past 12 months is " + userData.getRateOfReturn() + ". Would you like to hear suggestions to retire sooner?";
+                questionNo = 1;
+                shouldSessionEnd = false;
+                userPin = request.getVoyaPIN();
+                break;
+            case RETIREMENTAGE:
+                userData = this.getUserData(request.getVoyaPIN());
+                speech = "OK " + userData.getFirstName() + " you are projected to retire at age " +
+                        userData.getProjectedRetirementAge() + ". If you like, I can give you suggestions to retire at age"
+                        + userData.getLoweredRetirementAge();
+                questionNo = 1;
+                shouldSessionEnd = false;
+                userPin = request.getVoyaPIN();
         }
         if(! request.getLocale().startsWith("en")) {
             speech = translator.translate(speech, request.getLocale());

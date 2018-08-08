@@ -1,7 +1,7 @@
 package voya401k;
 /**
 This interface represents all of the data for a user that we will be working with. It is analagous to the DataRow
-variable in the javascript file.
+variable in the javascript file. The methods should be reflective of the different types of data we should be able to pull
  **/
 
 public interface VoyaUserDataObject {

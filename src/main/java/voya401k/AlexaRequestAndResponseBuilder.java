@@ -102,6 +102,12 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.PIN;
             case "VoyaYesIntent":
                 return VoyaIntentType.YES;
+            case "VoyaRateOfREturnIntent":
+                return VoyaIntentType.RATEOFRETURN;
+            case "VoyaRAteOfReturnIntent":
+                return VoyaIntentType.RATEOFRETURN;
+            case "VoyaRetirementAgeIntent":
+                return VoyaIntentType.RETIREMENTAGE;
             default:
                 return VoyaIntentType.QUIT;
         }
