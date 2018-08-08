@@ -78,17 +78,27 @@ public class VoyaControllerImpl implements VoyaController{
         int userPin = 0;
         boolean shouldSessionEnd = false;
 
-        switch(request.getIntent()) {
-            case NO:
-                if(request.getVoyaPIN() == 0) {
-                    speech = "Ok, have a nice day!";
-                    questionNo = request.getQuestionNo();
-                    userPin = request.getVoyaPIN();
-                    shouldSessionEnd = true;
-                    reprompt = "";
-                }
-                else {
-                    VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
+        if(request.getVoyaPIN() == 0) {
+            if(request.getIntent() == VoyaIntentType.NO) {
+                speech = "Ok, have a nice day!";
+                questionNo = request.getQuestionNo();
+                userPin = request.getVoyaPIN();
+                shouldSessionEnd = true;
+                reprompt = "";
+            }
+            else {
+                speech = "OK, go ahead and say your PIN";
+                questionNo = 0;
+                userPin = request.getVoyaPIN();
+                shouldSessionEnd = false;
+                reprompt = "";
+            }
+        }
+        else {
+            VoyaUserDataObject userData;
+            switch(request.getIntent()) {
+                case NO:
+                    userData = this.getUserData(request.getVoyaPIN());
                     speech = "Ok " + userData.getFirstName() +
                             "!, I understand thank you for using Voya 401k service, have a nice day!";
                     if(request.getQuestionNo() == 1) {
@@ -112,114 +122,116 @@ public class VoyaControllerImpl implements VoyaController{
                         userPin = request.getVoyaPIN();
                         shouldSessionEnd = true;
                     }
-
-                }
-                break;
-            case YES:
-                if(request.getVoyaPIN() == 0) {
-                    speech = "OK, go ahead and say your PIN";
-                }
-                else {
-                    if(request.getQuestionNo() == 1) {
-                        VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
-                        speech = "You are doing a great job of saving " + (int) (userData.getSavingsRate() * 100) + " percent from your pay." +
-                                " if you increase your savings rate to " + (int)(100 * (userData.getSavingsRateIncrease() + userData.getSavingsRate())) +
-                                " percent you could retire at age " +userData.getLoweredRetirementAge() + ". Would you like to"
-                                +" increase your savings rate by "+ (int) (100 * userData.getSavingsRateIncrease()) + " percent now?";
-                        reprompt = "Would you like to increase your savings rate by " + (int)(userData.getSavingsRateIncrease() * 100)
-                                + "percent now?";
-                        questionNo = 2;
-                        userPin = request.getVoyaPIN();
-                        shouldSessionEnd = false;
-                    }
-                    else if(request.getQuestionNo() == 2 || request.getQuestionNo() == 3) {
-                        speech = "OK, great. I\'ve done that for you. Congratulations, your future self will thank you!";
-                        questionNo = 0;
-                        reprompt = "";
-                        userPin = request.getVoyaPIN();
-                        shouldSessionEnd = true;
+                    break;
+                case YES:
+                    if(request.getVoyaPIN() == 0) {
+                        speech = "OK, go ahead and say your PIN";
                     }
                     else {
-                        speech = "I'm sorry?";
-                        questionNo = request.getQuestionNo();
+                        userData = this.getUserData(request.getVoyaPIN());
+                        if(request.getQuestionNo() == 1) {
+                            speech = "You are doing a great job of saving " + (int) (userData.getSavingsRate() * 100) + " percent from your pay." +
+                                    " if you increase your savings rate to " + (int)(100 * (userData.getSavingsRateIncrease() + userData.getSavingsRate())) +
+                                    " percent you could retire at age " +userData.getLoweredRetirementAge() + ". Would you like to"
+                                    +" increase your savings rate by "+ (int) (100 * userData.getSavingsRateIncrease()) + " percent now?";
+                            reprompt = "Would you like to increase your savings rate by " + (int)(userData.getSavingsRateIncrease() * 100)
+                                    + "percent now?";
+                            questionNo = 2;
+                            userPin = request.getVoyaPIN();
+                            shouldSessionEnd = false;
+                        }
+                        else if(request.getQuestionNo() == 2 || request.getQuestionNo() == 3) {
+                            speech = "OK, great. I\'ve done that for you. Congratulations, your future self will thank you!";
+                            questionNo = 0;
+                            reprompt = "";
+                            userPin = request.getVoyaPIN();
+                            shouldSessionEnd = true;
+                        }
+                        else {
+                            speech = "I'm sorry?";
+                            questionNo = request.getQuestionNo();
+                            userPin = request.getVoyaPIN();
+                            shouldSessionEnd = false;
+                            reprompt = "";
+                        }
+
+                    }
+                    break;
+                case QUIT:
+                    speech = "OK, have a nice day!";
+                    break;
+                case PIN:
+                    try{
+                        userData = this.getUserData(request.getVoyaPIN());
+                        //This is the point at which an IllegalArgumentException is thrown if the PIN is invalid.
+
+                        speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
+                                + "today?";
+                        questionNo = request.getVoyaPIN();
+                        reprompt = speech;
                         userPin = request.getVoyaPIN();
                         shouldSessionEnd = false;
-                        reprompt = "";
+
+                    } catch(IllegalArgumentException e) {
+                        speech = "Sorry, that's not a valid pin";
+                        reprompt = speech;
+                        shouldSessionEnd = false;
+                        questionNo = 0;
+                        userPin = 0;
                     }
+                    break;
+                case SUMMARY:
+                    userData = this.getUserData(request.getVoyaPIN());
 
-                }
-                break;
-            case QUIT:
-                speech = "OK, have a nice day!";
-                break;
-            case PIN:
-                try{
-                    VoyaUserDataObject userData = getUserData(request.getVoyaPIN());
-                    //This is the point at which an IllegalArgumentException is thrown if the PIN is invalid.
-
-                    speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
-                            + "today?";
-                    questionNo = request.getVoyaPIN();
-                    reprompt = speech;
+                    speech = "Sure "
+                            + userData.getFirstName() + ", As of " + userData.getLastUpdatedDate() + ", your account balance is "
+                            + userData.getAccountBalance() + ". Your rate of return for the past 12 months is "
+                            + (int)(userData.getRateOfReturn() * 100) + " percent, which is above the average portfolio benchmark for this period."
+                            + " Nice job making your money work for you! It looks like you are currently projected to have "
+                            + "enough money to retire at age "
+                            + userData.getProjectedRetirementAge()
+                            + ". Would you like to hear suggestions to be able retire a little sooner?";
+                    reprompt = "\"would you like to hear suggestions to be able to retire a little sooner?\"";
+                    questionNo = 1;
                     userPin = request.getVoyaPIN();
                     shouldSessionEnd = false;
+                    break;
+                case BALANCE:
+                    userData = this.getUserData(request.getVoyaPIN());
 
-                } catch(IllegalArgumentException e) {
-                    speech = "Sorry, that's not a valid pin";
-                    reprompt = speech;
+                    speech = "Your account balance is currently" + userData.getAccountBalance() +
+                            ". Would you like to hear suggestions to retire sooner?";
+                    questionNo = 1;
+                    userPin = request.getVoyaPIN();
                     shouldSessionEnd = false;
-                    questionNo = 0;
-                    userPin = 0;
-                }
-                break;
-            case SUMMARY:
-                VoyaUserDataObject userData = this.getUserData(request.getVoyaPIN());
-
-                speech = "Sure "
-                        + userData.getFirstName() + ", As of " + userData.getLastUpdatedDate() + ", your account balance is "
-                        + userData.getAccountBalance() + ". Your rate of return for the past 12 months is "
-                        + (int)(userData.getRateOfReturn() * 100) + " percent, which is above the average portfolio benchmark for this period."
-                        + " Nice job making your money work for you! It looks like you are currently projected to have "
-                        + "enough money to retire at age "
-                        + userData.getProjectedRetirementAge()
-                        + ". Would you like to hear suggestions to be able retire a little sooner?";
-                reprompt = "\"would you like to hear suggestions to be able to retire a little sooner?\"";
-                questionNo = 1;
-                userPin = request.getVoyaPIN();
-                shouldSessionEnd = false;
-                break;
-            case BALANCE:
-                userData = this.getUserData(request.getVoyaPIN());
-
-                speech = "Your account balance is currently" + userData.getAccountBalance() +
-                        ". Would you like to hear suggestions to retire sooner?";
-                questionNo = 1;
-                userPin = request.getVoyaPIN();
-                shouldSessionEnd = false;
-                break;
-            case SAVINGSRATE:
-                userData = this.getUserData(request.getVoyaPIN());
-                speech = "Sure, your current savings rate is " + userData.getSavingsRate() + ". If you like, I can increase your savings rate by 2% to allow you to retire sooner";
-                questionNo = 2;
-                shouldSessionEnd =false;
-                userPin = request.getVoyaPIN();
-                break;
-            case RATEOFRETURN:
-                userData = this.getUserData(request.getVoyaPIN());
-                speech = "Your rate of return for the past 12 months is " + userData.getRateOfReturn() + ". Would you like to hear suggestions to retire sooner?";
-                questionNo = 1;
-                shouldSessionEnd = false;
-                userPin = request.getVoyaPIN();
-                break;
-            case RETIREMENTAGE:
-                userData = this.getUserData(request.getVoyaPIN());
-                speech = "OK " + userData.getFirstName() + " you are projected to retire at age " +
-                        userData.getProjectedRetirementAge() + ". If you like, I can give you suggestions to retire at age"
-                        + userData.getLoweredRetirementAge();
-                questionNo = 1;
-                shouldSessionEnd = false;
-                userPin = request.getVoyaPIN();
+                    break;
+                case SAVINGSRATE:
+                    userData = this.getUserData(request.getVoyaPIN());
+                    speech = "Sure, your current savings rate is " + userData.getSavingsRate() + ". If you like, I can increase your savings rate by 2% to allow you to retire sooner";
+                    questionNo = 2;
+                    shouldSessionEnd =false;
+                    userPin = request.getVoyaPIN();
+                    break;
+                case RATEOFRETURN:
+                    userData = this.getUserData(request.getVoyaPIN());
+                    speech = "Your rate of return for the past 12 months is " + userData.getRateOfReturn() + ". Would you like to hear suggestions to retire sooner?";
+                    questionNo = 1;
+                    shouldSessionEnd = false;
+                    userPin = request.getVoyaPIN();
+                    break;
+                case RETIREMENTAGE:
+                    userData = this.getUserData(request.getVoyaPIN());
+                    speech = "OK " + userData.getFirstName() + " you are projected to retire at age " +
+                            userData.getProjectedRetirementAge() + ". If you like, I can give you suggestions to retire at age "
+                            + userData.getLoweredRetirementAge();
+                    questionNo = 1;
+                    shouldSessionEnd = false;
+                    userPin = request.getVoyaPIN();
+            }
         }
+
+
+
         if(! request.getLocale().startsWith("en")) {
             speech = translator.translate(speech, request.getLocale());
             reprompt = translator.translate(speech, request.getLocale());
