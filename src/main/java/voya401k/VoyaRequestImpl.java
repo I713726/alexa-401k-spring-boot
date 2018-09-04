@@ -1,5 +1,6 @@
 package voya401k;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class VoyaRequestImpl implements VoyaRequest {
@@ -9,11 +10,11 @@ public class VoyaRequestImpl implements VoyaRequest {
     VoyaRequestType requestType;
     String locale;
     VoyaIntentType intentType;
-    Date startDate;
-    Date endDate;
+    Calendar startDate;
+    Calendar endDate;
 
     public VoyaRequestImpl(int questionNo, int voyaPIN,
-                           VoyaRequestType requestType, String locale, VoyaIntentType intentType, Date startDate, Date endDate){
+                           VoyaRequestType requestType, String locale, VoyaIntentType intentType, Calendar startDate, Calendar endDate){
         this.questionNo = questionNo;
         this.voyaPIN = voyaPIN;
         this.requestType = requestType;
@@ -49,12 +50,12 @@ public class VoyaRequestImpl implements VoyaRequest {
     }
 
     @Override
-    public Date getStartDate() {
+    public Calendar getStartDate() {
         return startDate;
     }
 
     @Override
-    public Date getEndDate() {
+    public Calendar getEndDate() {
         return endDate;
     }
 }

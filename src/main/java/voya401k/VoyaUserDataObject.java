@@ -1,5 +1,6 @@
 package voya401k;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -69,5 +70,5 @@ public interface VoyaUserDataObject {
      */
     int getLoweredRetirementAge();
 
-    List<String> getRecentTransactions(Date fromDate, Date toDate);
+    List<String> getRecentTransactions(Calendar fromDate, Calendar toDate);
 }

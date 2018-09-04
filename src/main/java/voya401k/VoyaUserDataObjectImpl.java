@@ -2,6 +2,7 @@ package voya401k;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -80,14 +81,14 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
     }
 
     @Override
-    public List<String> getRecentTransactions(Date fromDate, Date toDate) {
+    public List<String> getRecentTransactions(Calendar fromDate, Calendar toDate) {
         ArrayList<String> result = new ArrayList<>();
         for(AccountTransaction transaction: this.transactions) {
             //TODO: NEED TO MAKE RANGE INCLUSIVE
-            if(!transaction.getDate().after(toDate) && !transaction.getDate().before(fromDate)) {
+            if(!transaction.getDate().before(fromDate) && !transaction.getDate().after(toDate)) {
                 SimpleDateFormat alexaFormat = new SimpleDateFormat("yyyy-MM-dd");
-                System.out.println(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate()));
-                result.add(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate()));
+                System.out.println(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate().getTime()));
+                result.add(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate().getTime()));
             }
         }
         return result;

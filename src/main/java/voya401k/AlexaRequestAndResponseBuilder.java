@@ -3,13 +3,14 @@ package voya401k;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
+import sun.awt.geom.AreaOp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.jar.JarEntry;
+
 
 public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBuilder{
 
@@ -19,8 +20,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         JSONObject jsonObject = new JSONObject(jsonData);
         int questionNo;
         int voyaPIN;
-        Date fromDate = new Date();
-        Date toDate = new Date();
+        Calendar fromDate = new GregorianCalendar();
+        Calendar toDate = new GregorianCalendar();
         VoyaIntentType intentType;
         try{
             questionNo = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("questionNo");
@@ -60,44 +61,39 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         if(intentType == VoyaIntentType.ACCOUNTACTIVITY) {
             SimpleDateFormat alexaFormat = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                fromDate = alexaFormat.parse(jsonObject.getJSONObject("request").getJSONObject("intent")
-                        .getJSONObject("slots").getJSONObject("fromDate").getString("value"));
+                fromDate.setTime(alexaFormat.parse(jsonObject.getJSONObject("request").getJSONObject("intent")
+                        .getJSONObject("slots").getJSONObject("fromDate").getString("value")));
             } catch(JSONException e) {
                 //then we must be dealing with a number of days, but the number of days will be converted to a
                 // date range ending today.
                 try {
                     int numDays = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots")
                             .getJSONObject("numDays").getInt("value");
-                    toDate = new Date();
                     Calendar cal = GregorianCalendar.getInstance();
-                    cal.setTime(toDate);
-                    cal.add(GregorianCalendar.DAY_OF_MONTH, 0 - numDays);
-                    fromDate = cal.getTime();
+                    toDate.setTime(new Date());
+                    fromDate = new GregorianCalendar();
+                    fromDate.setTime(new Date());
+                    fromDate.add(GregorianCalendar.DAY_OF_MONTH, 0 - numDays);
                 }
                 catch(JSONException ex) {
-                    toDate = new Date();
                     Calendar cal = GregorianCalendar.getInstance();
-                    cal.setTime(toDate);
+                    cal.setTime(new Date());
                     cal.add(GregorianCalendar.DAY_OF_MONTH, 0 - 5);
-                    fromDate = cal.getTime();
+                    fromDate = cal;
                 }
             }
             catch (ParseException e) {
                 //Not sure what to do here, if the text is an invalid date.
             }
             try {
-                toDate = alexaFormat.parse(jsonObject.getJSONObject("request").getJSONObject("intent")
-                        .getJSONObject("slots").getJSONObject("toDate").getString("value"));
+                toDate.setTime(alexaFormat.parse(jsonObject.getJSONObject("request").getJSONObject("intent")
+                        .getJSONObject("slots").getJSONObject("toDate").getString("value")));
             }
             catch(JSONException e) {
-                toDate = new Date();
-                Calendar cal = GregorianCalendar.getInstance();
-                cal.setTime(toDate);
-                cal.add(GregorianCalendar.DAY_OF_MONTH, 0 - 5);
-                fromDate = cal.getTime();
+                toDate.setTime(new Date());
             }
             catch(ParseException e) {
-                toDate = new Date();
+                toDate.setTime(new Date());
             }
         }
 

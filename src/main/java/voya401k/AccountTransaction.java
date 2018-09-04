@@ -1,17 +1,19 @@
 package voya401k;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class AccountTransaction {
-    private Date date;
+    private Calendar date;
     private String description;
 
-    AccountTransaction(Date date, String description) {
+    AccountTransaction(GregorianCalendar date, String description) {
         this.date = date;
         this.description = description;
     }
 
-    public Date getDate() {
+    public Calendar getDate() {
         return  this.date;
     }
 

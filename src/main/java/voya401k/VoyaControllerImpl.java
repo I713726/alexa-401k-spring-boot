@@ -203,10 +203,16 @@ public class VoyaControllerImpl implements VoyaController{
                     DateFormat alexaFormat = new SimpleDateFormat("MM-dd-yyyy");
                     List<String> recentTransactions = userData.getRecentTransactions(request.getStartDate(),
                             request.getEndDate());
-                    speech += "Here is your account activity from " + alexaFormat.format(request.getStartDate()) +
-                            " to " + alexaFormat.format(request.getEndDate()) +". ";
-                    for(String item: recentTransactions) {
-                        speech += item +". ";
+                    if(recentTransactions.size() > 0) {
+                        speech += "Here is your account activity from " + alexaFormat.format(request.getStartDate().getTime()) +
+                                " to " + alexaFormat.format(request.getEndDate().getTime()) +". ";
+                        for(String item: recentTransactions) {
+                            speech += item +". ";
+                        }
+                    }
+                    else {
+                        speech += "There are no transactions between " + alexaFormat.format(request.getStartDate().getTime()) +
+                                " and " + alexaFormat.format(request.getEndDate().getTime()) +". ";
                     }
                     questionNo = 1;
                     userPin = request.getVoyaPIN();
@@ -260,9 +266,12 @@ public class VoyaControllerImpl implements VoyaController{
         if(pin == 0) {
             throw new IllegalArgumentException("Not a valid pin!");
         }
-        AccountTransaction transaction1 = new AccountTransaction(new Date(2018, 8, 25), "Deposit of $10");
-        AccountTransaction transaction2 = new AccountTransaction(new Date(2018, 8, 27), "Deposit of $5");
-        AccountTransaction transaction3 = new AccountTransaction(new Date(2018, 8, 29), "deposit of $1");
+        GregorianCalendar calendar1 = new GregorianCalendar(2018, 7, 25);
+        GregorianCalendar calendar2 = new GregorianCalendar(2018, 7, 25);
+        GregorianCalendar calendar3 = new GregorianCalendar(2018, 7, 29);
+        AccountTransaction transaction1 = new AccountTransaction(calendar1, "Deposit of $10");
+        AccountTransaction transaction2 = new AccountTransaction(calendar2, "Deposit of $5");
+        AccountTransaction transaction3 = new AccountTransaction(calendar3, "deposit of $1");
         List<AccountTransaction> transactionList = new ArrayList<>();
         transactionList.add(transaction1);
         transactionList.add(transaction2);
