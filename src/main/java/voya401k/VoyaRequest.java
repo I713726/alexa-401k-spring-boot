@@ -1,5 +1,7 @@
 package voya401k;
 
+import java.util.Date;
+
 public interface VoyaRequest {
     /**
      * returns the question number, used for tracking where the user is in the flow of interaction.
@@ -35,4 +37,18 @@ public interface VoyaRequest {
      * @return intent type from enum VoyaIntentType
      */
     VoyaIntentType getIntent();
+
+    /**
+     * If the intent is to retrieve transactions in a date range, this method returns the start date, otherwise it
+     * returns the current date.
+     * @return the starting date for looking up recent transactions
+     */
+    Date getStartDate();
+
+    /**
+     * If the intent is to retrieve transactions in a date range, this method returns the end date, otherwise it returns
+     * the current date.
+     * @return the ending date for looking up recent transactions
+     */
+    Date getEndDate();
 }

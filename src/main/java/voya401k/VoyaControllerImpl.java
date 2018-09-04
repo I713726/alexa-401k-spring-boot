@@ -1,5 +1,7 @@
 package voya401k;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Implementation of the VoyaController class. This class uses the method getResponse to appropriately answer every
@@ -167,7 +169,7 @@ public class VoyaControllerImpl implements VoyaController{
 
                         speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
                                 + "today?";
-                        questionNo = request.getVoyaPIN();
+                        questionNo = 1;
                         reprompt = speech;
                         userPin = request.getVoyaPIN();
                         shouldSessionEnd = false;
@@ -192,6 +194,20 @@ public class VoyaControllerImpl implements VoyaController{
                             + userData.getProjectedRetirementAge()
                             + ". Would you like to hear suggestions to be able retire a little sooner?";
                     reprompt = "\"would you like to hear suggestions to be able to retire a little sooner?\"";
+                    questionNo = 1;
+                    userPin = request.getVoyaPIN();
+                    shouldSessionEnd = false;
+                    break;
+                case ACCOUNTACTIVITY:
+                    userData = this.getUserData(request.getVoyaPIN());
+                    DateFormat alexaFormat = new SimpleDateFormat("MM-dd-yyyy");
+                    List<String> recentTransactions = userData.getRecentTransactions(request.getStartDate(),
+                            request.getEndDate());
+                    speech += "Here is your account activity from " + alexaFormat.format(request.getStartDate()) +
+                            " to " + alexaFormat.format(request.getEndDate()) +". ";
+                    for(String item: recentTransactions) {
+                        speech += item +". ";
+                    }
                     questionNo = 1;
                     userPin = request.getVoyaPIN();
                     shouldSessionEnd = false;
@@ -244,8 +260,18 @@ public class VoyaControllerImpl implements VoyaController{
         if(pin == 0) {
             throw new IllegalArgumentException("Not a valid pin!");
         }
-        return new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
+        AccountTransaction transaction1 = new AccountTransaction(new Date(2018, 8, 25), "Deposit of $10");
+        AccountTransaction transaction2 = new AccountTransaction(new Date(2018, 8, 27), "Deposit of $5");
+        AccountTransaction transaction3 = new AccountTransaction(new Date(2018, 8, 29), "deposit of $1");
+        List<AccountTransaction> transactionList = new ArrayList<>();
+        transactionList.add(transaction1);
+        transactionList.add(transaction2);
+        transactionList.add(transaction3);
+
+       VoyaUserDataObjectImpl result =  new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
                 .12, .04);
+       result.setTransactions(transactionList);
+       return result;
     }
 
 

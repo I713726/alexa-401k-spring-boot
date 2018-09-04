@@ -1,5 +1,10 @@
 package voya401k;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
 
     String firstName;
@@ -8,6 +13,7 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
     String lastUpdated;
     double rateOfReturn;
     double savingsRate;
+    List<AccountTransaction> transactions;
 
     public VoyaUserDataObjectImpl(String firstName, String lastName, int accountBalance, String lastUpdated,
                                   double rateOfReturn, double savingsRate) {
@@ -17,6 +23,10 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
         this.rateOfReturn = rateOfReturn;
         this.lastUpdated = lastUpdated;
         this.savingsRate = savingsRate;
+    }
+
+    public void setTransactions(List<AccountTransaction> transactions) {
+        this.transactions = transactions;
     }
 
     @Override
@@ -67,5 +77,19 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
     @Override
     public int getLoweredRetirementAge() {
         return 65;
+    }
+
+    @Override
+    public List<String> getRecentTransactions(Date fromDate, Date toDate) {
+        ArrayList<String> result = new ArrayList<>();
+        for(AccountTransaction transaction: this.transactions) {
+            //TODO: NEED TO MAKE RANGE INCLUSIVE
+            if(!transaction.getDate().after(toDate) && !transaction.getDate().before(fromDate)) {
+                SimpleDateFormat alexaFormat = new SimpleDateFormat("yyyy-MM-dd");
+                System.out.println(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate()));
+                result.add(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate()));
+            }
+        }
+        return result;
     }
 }

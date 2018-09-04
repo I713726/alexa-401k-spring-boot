@@ -1,5 +1,7 @@
 package voya401k;
 
+import java.util.Date;
+
 public class VoyaRequestImpl implements VoyaRequest {
 
     int questionNo;
@@ -7,14 +9,18 @@ public class VoyaRequestImpl implements VoyaRequest {
     VoyaRequestType requestType;
     String locale;
     VoyaIntentType intentType;
+    Date startDate;
+    Date endDate;
 
     public VoyaRequestImpl(int questionNo, int voyaPIN,
-                           VoyaRequestType requestType, String locale, VoyaIntentType intentType){
+                           VoyaRequestType requestType, String locale, VoyaIntentType intentType, Date startDate, Date endDate){
         this.questionNo = questionNo;
         this.voyaPIN = voyaPIN;
         this.requestType = requestType;
         this.locale = locale;
         this.intentType = intentType;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     @Override
@@ -40,5 +46,15 @@ public class VoyaRequestImpl implements VoyaRequest {
     @Override
     public VoyaIntentType getIntent() {
         return intentType;
+    }
+
+    @Override
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    @Override
+    public Date getEndDate() {
+        return endDate;
     }
 }
