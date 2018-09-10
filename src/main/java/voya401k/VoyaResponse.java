@@ -41,4 +41,10 @@ public interface VoyaResponse {
      * @return the boolean that says whether the session ends now.
      */
     boolean getShouldSessionEnd();
+
+    /**
+     * Number to tell us what notification we are on, starting at one, zero is uninitialized
+     * @return
+     */
+    int getNotificationNumber();
 }

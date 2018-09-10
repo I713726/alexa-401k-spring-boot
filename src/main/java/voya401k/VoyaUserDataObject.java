@@ -71,4 +71,6 @@ public interface VoyaUserDataObject {
     int getLoweredRetirementAge();
 
     List<String> getRecentTransactions(Calendar fromDate, Calendar toDate);
+
+    List<VoyaNotification> getNotifications();
 }

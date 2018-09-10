@@ -1,5 +1,6 @@
 package voya401k;
 
+import javax.print.DocFlavor;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,6 +16,7 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
     double rateOfReturn;
     double savingsRate;
     List<AccountTransaction> transactions;
+    List<VoyaNotification> notifications;
 
     public VoyaUserDataObjectImpl(String firstName, String lastName, int accountBalance, String lastUpdated,
                                   double rateOfReturn, double savingsRate) {
@@ -28,6 +30,10 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
 
     public void setTransactions(List<AccountTransaction> transactions) {
         this.transactions = transactions;
+    }
+
+    public void setNotifications(List<VoyaNotification> notifications) {
+        this.notifications = notifications;
     }
 
     @Override
@@ -92,5 +98,10 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<VoyaNotification> getNotifications() {
+        return new ArrayList<>(this.notifications);
     }
 }

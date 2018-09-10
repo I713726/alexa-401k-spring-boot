@@ -1,5 +1,6 @@
 package voya401k;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
@@ -19,6 +20,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     public VoyaRequest buildRequest(String jsonData) {
         JSONObject jsonObject = new JSONObject(jsonData);
         int questionNo;
+        int notificationNumber;
         int voyaPIN;
         Calendar fromDate = new GregorianCalendar();
         Calendar toDate = new GregorianCalendar();
@@ -30,9 +32,18 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             questionNo = 0;
         }
 
+        try {
+            notificationNumber = jsonObject.getJSONObject("session").getJSONObject("attributes")
+                    .getInt("notificationNo");
+        }
+        catch(JSONException e) {
+            notificationNumber = 0;
+        }
+
         try{
             intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
         }
+
         catch(JSONException e) {
             intentType = null;
         }
@@ -100,7 +111,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
         String locale = jsonObject.getJSONObject("request").getString("locale");
 
-        return new VoyaRequestImpl(questionNo, voyaPIN, requestType, locale, intentType, fromDate, toDate);
+        return new VoyaRequestImpl(questionNo, voyaPIN, requestType, locale, intentType, fromDate, toDate, notificationNumber);
     }
 
     @Override
@@ -112,14 +123,22 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 .put("ssml", "<speak>" + response.getSpeech() + "</speak>")));
         outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
                 new JSONObject().put("type", "SSML").put("ssml", ("<speak>" + response.getReprompt() + "</speak>"))));
+
+        //outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
+        outJson.put("sessionAttributes", new JSONObject().put("voyaPin", response.getUserPIN()));
+        outJson.getJSONObject("sessionAttributes").put("questionNo", response.getQuestionNumber())
+                .put("voyaPin", response.getUserPIN());
+        outJson.getJSONObject("sessionAttributes").put("notificationNo", response.getNotificationNumber());
+
+        //testing video play
         /*
         outJson.getJSONObject("response").put("directives", new JSONArray().put(
-                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://youtu.be/XFJRJPY7Z_A")
+                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://drive.google.com/uc?export=download&id=0B5GHSc8KvSS8c2tTYWNSWm1LanM")
                 .put("metadata", new JSONObject().put("title", "retirement day video").put("subtitle", "subtitle")))));
-                */
-        outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
-        outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
-                .put("voyaPin", response.getUserPIN()));
+
+        */
+
+
         return outJson.toString();
     }
 
@@ -158,6 +177,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.RETIREMENTAGE;
             case "VoyaAccountActivityIntent":
                 return VoyaIntentType.ACCOUNTACTIVITY;
+            case "VoyaViewNotificationsIntent":
+                return VoyaIntentType.VIEWNOTIFICATIONS;
             default:
                 return VoyaIntentType.QUIT;
         }

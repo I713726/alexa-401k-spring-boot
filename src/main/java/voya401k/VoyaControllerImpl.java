@@ -1,4 +1,5 @@
 package voya401k;
+import javax.management.Notification;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -6,6 +7,15 @@ import java.util.*;
 /**
  * Implementation of the VoyaController class. This class uses the method getResponse to appropriately answer every
  * request.
+ *
+ * Question numbers:
+ * 0 - PIN
+ * 1 - welcome question
+ * 2 - would you like to hear suggestions..
+ * 3 - save more
+ * 4 - save more in future
+ * 5 - viewing notifications
+ * 6 - responding to notifications
  */
 public class VoyaControllerImpl implements VoyaController{
 
@@ -25,6 +35,7 @@ public class VoyaControllerImpl implements VoyaController{
         String reprompt = "";
         int questionNumber = 0;
         int userPin = 0;
+        int notificationNumber = 0;
         boolean shouldSessionEnd = false;
         switch(request.getRequestType()) {
             case LAUNCH_REQUEST:
@@ -64,13 +75,13 @@ public class VoyaControllerImpl implements VoyaController{
                 break;
             default:
             return new VoyaResponseImpl(0, 0,
-                    "The skill could not understand your request", "", true);
+                    "The skill could not understand your request", "", true, notificationNumber);
         }
         if(! request.getLocale().startsWith("en")) {
             speech = translator.translate(speech, request.getLocale());
             reprompt = translator.translate(reprompt, request.getLocale());
         }
-        return new VoyaResponseImpl(questionNumber, userPin, speech, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, userPin, speech, reprompt, shouldSessionEnd, notificationNumber);
     }
 
     private VoyaResponse handleIntentRequest(VoyaRequest request) {
@@ -79,6 +90,7 @@ public class VoyaControllerImpl implements VoyaController{
         int questionNo = 0;
         int userPin = 0;
         boolean shouldSessionEnd = false;
+        int notificationNumber = request.getNotificationNumber();
 
         if(request.getVoyaPIN() == 0) {
             if(request.getIntent() == VoyaIntentType.NO) {
@@ -117,6 +129,36 @@ public class VoyaControllerImpl implements VoyaController{
                         userPin = request.getVoyaPIN();
                         shouldSessionEnd = false;
                     }
+                    else if(request.getQuestionNo() == 6) {
+                        userData.getNotifications().get(request.getNotificationNumber() - 1).sendResponse("no");
+                        userPin = request.getVoyaPIN();
+                        shouldSessionEnd = false;
+                        reprompt = "";
+                        if(notificationNumber == userData.getNotifications().size()) {
+                            speech = "OK, got it. That's all the notifications! Is there anything else I can do to help?";
+                            notificationNumber = 0;
+                            questionNo = 1;
+                        }
+                        else {
+                            speech = "Ok, got it! ";
+                            notificationNumber ++;
+                            if(userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                                speech += userData.getNotifications().get(notificationNumber - 1).getText();
+                                questionNo = 6;
+                            }
+                            else {
+                                while(! userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                                    speech += userData.getNotifications().get(notificationNumber - 1).getText() + ".\n";
+                                    notificationNumber ++;
+                                    if(notificationNumber > userData.getNotifications().size()) {
+                                        speech += "That's all of the notifications, " +
+                                                "is there anything else I can help you with?";
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     else {
                         speech = "Ok, " + userData.getFirstName() + ",thank you for using Voya 401k service, have a good day!";
                         reprompt = "";
@@ -149,6 +191,36 @@ public class VoyaControllerImpl implements VoyaController{
                             userPin = request.getVoyaPIN();
                             shouldSessionEnd = true;
                         }
+                        else if (request.getQuestionNo() == 6) {
+                            userData.getNotifications().get(request.getNotificationNumber() - 1).sendResponse("yes");
+                            userPin = request.getVoyaPIN();
+                            shouldSessionEnd = false;
+                            reprompt = "";
+                            if(notificationNumber == userData.getNotifications().size()) {
+                                speech = "OK, got it. That's all the notifications! Is there anything else I can do to help?";
+                                notificationNumber = 0;
+                                questionNo = 1;
+                            }
+                            else {
+                                speech = "Ok, got it! ";
+                                notificationNumber ++;
+                                if(userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                                    speech += userData.getNotifications().get(notificationNumber - 1).getText();
+                                    questionNo = 6;
+                                }
+                                else {
+                                    while(! userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                                        speech += userData.getNotifications().get(notificationNumber - 1).getText() + ".\n";
+                                        notificationNumber ++;
+                                        if(notificationNumber > userData.getNotifications().size()) {
+                                            speech += " That's all of the notifications, " +
+                                                    "is there anything else I can help you with?";
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         else {
                             speech = "I'm sorry?";
                             questionNo = request.getQuestionNo();
@@ -168,7 +240,13 @@ public class VoyaControllerImpl implements VoyaController{
                         //This is the point at which an IllegalArgumentException is thrown if the PIN is invalid.
 
                         speech = "Hi " + userData.getFirstName() + ". How can I help you with your " + userData.getPlanName()
-                                + "today?";
+                                + "today? ";
+                        if(userData.getNotifications().size() == 1) {
+                            speech += "you have a notification";
+                        }
+                        else if(userData.getNotifications().size() > 1) {
+                            speech += "you have " + userData.getNotifications().size() + " notifications";
+                        }
                         questionNo = 1;
                         reprompt = speech;
                         userPin = request.getVoyaPIN();
@@ -218,6 +296,33 @@ public class VoyaControllerImpl implements VoyaController{
                     userPin = request.getVoyaPIN();
                     shouldSessionEnd = false;
                     break;
+                case VIEWNOTIFICATIONS:
+                    userData = this.getUserData(request.getVoyaPIN());
+                    if(userData.getNotifications().size() == 0) {
+                        speech = "There are no notifications";
+                        questionNo = 1;
+                    }
+                    else {
+                        speech = "OK, ";
+                        questionNo = 5;
+                        notificationNumber = 1;
+                        speech += userData.getNotifications().get(notificationNumber - 1).getText();
+                        if(userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                            questionNo = 6;
+                        }
+                        else {
+                            while(! userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
+                                speech += userData.getNotifications().get(notificationNumber - 1).getText() + ".\n";
+                                notificationNumber ++;
+                                if(notificationNumber > userData.getNotifications().size()) {
+                                    speech += " That's all of the notifications, " +
+                                            "is there anything else I can help you with?";
+                                }
+                            }
+                        }
+                    }
+                    userPin = request.getVoyaPIN();
+                    break;
                 case BALANCE:
                     userData = this.getUserData(request.getVoyaPIN());
 
@@ -258,7 +363,7 @@ public class VoyaControllerImpl implements VoyaController{
             speech = translator.translate(speech, request.getLocale());
             reprompt = translator.translate(speech, request.getLocale());
         }
-        return new VoyaResponseImpl(questionNo, userPin, speech, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNo, userPin, speech, reprompt, shouldSessionEnd, notificationNumber);
     }
 
     private VoyaUserDataObject getUserData(int pin) throws IllegalArgumentException {
@@ -277,9 +382,17 @@ public class VoyaControllerImpl implements VoyaController{
         transactionList.add(transaction2);
         transactionList.add(transaction3);
 
+        VoyaNotification paperless = new VoyaNotificationImpl("We noticed you are recieving statments by mail, " +
+                "would you like to switch to paperless and recieve all statements online?", true);
+        VoyaNotification testNonInteractive = new VoyaNotificationImpl("Test non interactive notification", false);
+        List<VoyaNotification> notifications = new ArrayList<>();
+        notifications.add(paperless);
+        notifications.add(testNonInteractive);
+
        VoyaUserDataObjectImpl result =  new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
                 .12, .04);
        result.setTransactions(transactionList);
+       result.setNotifications(notifications);
        return result;
     }
 

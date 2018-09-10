@@ -52,4 +52,10 @@ public interface VoyaRequest {
      * @return the ending date for looking up recent transactions
      */
     Calendar getEndDate();
+
+    /**
+     * Returns an index to tell what notification we are on, starting at one, zero if uninitialized
+     * @return
+     */
+    int getNotificationNumber();
 }

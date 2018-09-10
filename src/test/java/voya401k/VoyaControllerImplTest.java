@@ -11,10 +11,10 @@ public class VoyaControllerImplTest {
     public void testGetResponse() {
         //TODO: Launch requests do not have intent types, need to find resolution for this issue.
         VoyaControllerImpl controller = new VoyaControllerImpl();
-        VoyaRequestImpl req1 = new VoyaRequestImpl(0,0,VoyaRequestType.LAUNCH_REQUEST, "en-US", null, new GregorianCalendar(), new GregorianCalendar());
-        VoyaRequestImpl req2 = new VoyaRequestImpl(0, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.SUMMARY, new GregorianCalendar(), new GregorianCalendar());
-        VoyaRequestImpl req3 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.SUMMARY, new GregorianCalendar(), new GregorianCalendar());
-        VoyaRequestImpl req4 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.YES, new GregorianCalendar(), new GregorianCalendar());
+        VoyaRequestImpl req1 = new VoyaRequestImpl(0,0,VoyaRequestType.LAUNCH_REQUEST, "en-US", null, new GregorianCalendar(), new GregorianCalendar(), 0);
+        VoyaRequestImpl req2 = new VoyaRequestImpl(0, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.SUMMARY, new GregorianCalendar(), new GregorianCalendar(), 0);
+        VoyaRequestImpl req3 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.SUMMARY, new GregorianCalendar(), new GregorianCalendar(), 0);
+        VoyaRequestImpl req4 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.YES, new GregorianCalendar(), new GregorianCalendar(), 0);
 
 
 //        Assert.assertEquals("Hi, Welcome to Voya 401K service. To get started please say your PIN",
