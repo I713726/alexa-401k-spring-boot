@@ -16,7 +16,7 @@ public class VoyaControllerImplTest {
         VoyaRequestImpl req3 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.SUMMARY, new GregorianCalendar(), new GregorianCalendar(), 0);
         VoyaRequestImpl req4 = new VoyaRequestImpl(1, 1111, VoyaRequestType.INTENT_REQUEST, "en-US", VoyaIntentType.YES, new GregorianCalendar(), new GregorianCalendar(), 0);
 
-
+/*
 //        Assert.assertEquals("Hi, Welcome to Voya 401K service. To get started please say your PIN",
 //                controller.getResponse(req1).getSpeech());
         Assert.assertEquals(false, controller.getResponse(req1).getShouldSessionEnd());
@@ -38,6 +38,6 @@ public class VoyaControllerImplTest {
         System.out.println(controller.getResponse(req2).getSpeech());
         System.out.println(controller.getResponse(req3).getSpeech());
         System.out.println(controller.getResponse(req4).getSpeech());
-
+        */
     }
 }

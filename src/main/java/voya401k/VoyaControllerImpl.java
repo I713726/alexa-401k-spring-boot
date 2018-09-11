@@ -1,6 +1,14 @@
 package voya401k;
-import javax.management.Notification;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -253,6 +261,7 @@ public class VoyaControllerImpl implements VoyaController{
                         shouldSessionEnd = false;
 
                     } catch(IllegalArgumentException e) {
+                        e.printStackTrace();
                         speech = "Sorry, that's not a valid pin";
                         reprompt = speech;
                         shouldSessionEnd = false;
@@ -369,18 +378,47 @@ public class VoyaControllerImpl implements VoyaController{
     private VoyaUserDataObject getUserData(int pin) throws IllegalArgumentException {
         //TODO: Comlete Implementation, this is dummy implementation for testing
         if(pin == 0) {
+            System.out.println("pin = 0");
             throw new IllegalArgumentException("Not a valid pin!");
         }
-        GregorianCalendar calendar1 = new GregorianCalendar(2018, 7, 25);
-        GregorianCalendar calendar2 = new GregorianCalendar(2018, 7, 25);
-        GregorianCalendar calendar3 = new GregorianCalendar(2018, 7, 29);
-        AccountTransaction transaction1 = new AccountTransaction(calendar1, "Deposit of $10");
-        AccountTransaction transaction2 = new AccountTransaction(calendar2, "Deposit of $5");
-        AccountTransaction transaction3 = new AccountTransaction(calendar3, "deposit of $1");
+
         List<AccountTransaction> transactionList = new ArrayList<>();
-        transactionList.add(transaction1);
-        transactionList.add(transaction2);
-        transactionList.add(transaction3);
+        File input = new File("transactionData.html");
+        Document document;
+        try {
+            document = Jsoup.parse(input, "UTF-8", "");
+        }
+        catch(IOException e) {
+            System.out.println("IO error");
+            throw new IllegalArgumentException("IO error");
+        }
+
+        Element table = document.select("table").get(0);
+        Elements rows = table.select("tr");
+
+        for(int i = 1; i < rows.size(); i ++) {
+            Element row = rows.get(i);
+            Elements cols = row.select("td");
+            System.out.println("Cols size: " + cols.size());
+            System.out.println("Rows size: " + rows.size());
+            DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+            try {
+                GregorianCalendar calendar = new GregorianCalendar();
+                //Index out of bounds exception thrown below
+                calendar.setTime(format.parse(cols.get(0).text()));
+                transactionList.add(new AccountTransaction(calendar,
+                        cols.get(1).text(), cols.get(2).text(), Float.parseFloat(cols.get(3).text()),
+                        Float.parseFloat(cols.get(4).text()), Float.parseFloat(cols.get(5).text().substring(1))
+                        ));
+            }
+            catch(ParseException e) {
+                //Not sure what to do
+                System.out.println("Parse exception");
+            }
+
+        }
+
+
 
         VoyaNotification paperless = new VoyaNotificationImpl("We noticed you are recieving statments by mail, " +
                 "would you like to switch to paperless and recieve all statements online?", true);

@@ -29,6 +29,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.jayway.jsonpath:json-path')
+    compile('org.jsoup:jsoup:1.11.3')
     compile group: 'org.json', name: 'json', version: '20180130'
 }
 

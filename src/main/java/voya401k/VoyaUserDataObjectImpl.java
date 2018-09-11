@@ -93,8 +93,8 @@ public class VoyaUserDataObjectImpl implements VoyaUserDataObject {
             //TODO: NEED TO MAKE RANGE INCLUSIVE
             if(!transaction.getDate().before(fromDate) && !transaction.getDate().after(toDate)) {
                 SimpleDateFormat alexaFormat = new SimpleDateFormat("yyyy-MM-dd");
-                System.out.println(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate().getTime()));
-                result.add(transaction.getDescription() + " on " + alexaFormat.format(transaction.getDate().getTime()));
+                result.add(transaction.getActivity() + " on " + alexaFormat.format(transaction.getDate().getTime())
+                + " of $" + transaction.getAmount());
             }
         }
         return result;
