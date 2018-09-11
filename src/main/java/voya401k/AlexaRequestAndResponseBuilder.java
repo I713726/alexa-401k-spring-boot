@@ -124,7 +124,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         outJson.getJSONObject("response").put("reprompt", new JSONObject().put("outputSpeech",
                 new JSONObject().put("type", "SSML").put("ssml", ("<speak>" + response.getReprompt() + "</speak>"))));
 
-        //outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
+        outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("voyaPin", response.getUserPIN()));
         outJson.getJSONObject("sessionAttributes").put("questionNo", response.getQuestionNumber())
                 .put("voyaPin", response.getUserPIN());
