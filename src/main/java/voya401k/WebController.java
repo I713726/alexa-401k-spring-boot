@@ -1,7 +1,5 @@
 package voya401k;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,6 +20,16 @@ public class WebController {
     @ResponseBody
     public String process(@RequestBody String payload) {
         AlexaRequestAndResponseBuilder builder = new AlexaRequestAndResponseBuilder();
+        VoyaRequest request = builder.buildRequest(payload);
+        VoyaResponse response = new VoyaControllerImpl().getResponse(request);
+        String jsonResponse = builder.buildResponse(response);
+        return jsonResponse;
+    }
+
+    @RequestMapping(value = "/voya401k-visual", method = RequestMethod.POST)
+    @ResponseBody
+    public String visualSkillProcess(@RequestBody String payload) {
+        EchoShowRequestAndResponseBuilder builder = new EchoShowRequestAndResponseBuilder();
         VoyaRequest request = builder.buildRequest(payload);
         VoyaResponse response = new VoyaControllerImpl().getResponse(request);
         String jsonResponse = builder.buildResponse(response);

@@ -127,13 +127,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 .put("voyaPin", response.getUserPIN());
         outJson.getJSONObject("sessionAttributes").put("notificationNo", response.getNotificationNumber());
 
-        //testing video play
-        /*
-        outJson.getJSONObject("response").put("directives", new JSONArray().put(
-                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://drive.google.com/uc?export=download&id=0B5GHSc8KvSS8c2tTYWNSWm1LanM")
-                .put("metadata", new JSONObject().put("title", "retirement day video").put("subtitle", "subtitle")))));
 
-        */
 
 
         return outJson.toString();

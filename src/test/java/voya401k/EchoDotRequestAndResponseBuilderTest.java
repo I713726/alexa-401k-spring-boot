@@ -2,7 +2,7 @@ package voya401k;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AlexaRequestAndResponseBuilderTest {
+public class EchoDotRequestAndResponseBuilderTest {
 
     @Test
     public void testCreateRequest() {
