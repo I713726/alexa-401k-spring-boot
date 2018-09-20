@@ -22,7 +22,7 @@ public class WebController {
         AlexaRequestAndResponseBuilder builder = new AlexaRequestAndResponseBuilder();
         VoyaRequest request = builder.buildRequest(payload);
         VoyaResponse response = new VoyaControllerImpl().getResponse(request);
-        String jsonResponse = builder.buildResponse(response);
+        String jsonResponse = builder.buildResponse(response, request);
         return jsonResponse;
     }
 
@@ -32,7 +32,7 @@ public class WebController {
         EchoShowRequestAndResponseBuilder builder = new EchoShowRequestAndResponseBuilder();
         VoyaRequest request = builder.buildRequest(payload);
         VoyaResponse response = new VoyaControllerImpl().getResponse(request);
-        String jsonResponse = builder.buildResponse(response);
+        String jsonResponse = builder.buildResponse(response, request);
         return jsonResponse;
     }
 }

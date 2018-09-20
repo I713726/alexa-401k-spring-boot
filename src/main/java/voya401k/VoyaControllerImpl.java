@@ -5,7 +5,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -99,6 +98,7 @@ public class VoyaControllerImpl implements VoyaController{
         int userPin = 0;
         boolean shouldSessionEnd = false;
         int notificationNumber = request.getNotificationNumber();
+        VisualDisplay display = null;
 
         if(request.getVoyaPIN() == 0) {
             if(request.getIntent() == VoyaIntentType.NO) {
@@ -241,6 +241,7 @@ public class VoyaControllerImpl implements VoyaController{
                     break;
                 case QUIT:
                     speech = "OK, have a nice day!";
+                    shouldSessionEnd = true;
                     break;
                 case PIN:
                     try{
@@ -283,30 +284,47 @@ public class VoyaControllerImpl implements VoyaController{
                     reprompt = "\"would you like to hear suggestions to be able to retire a little sooner?\"";
                     questionNo = 1;
                     userPin = request.getVoyaPIN();
+                    display = new VisualDisplayImpl("Account Summary",
+                            "Account Balance: $" + userData.getAccountBalance(),
+                            "Rate of Return for last 12 Months: " + userData.getRateOfReturn() * 100 + "%",
+                            "Projected Retirment age: " + userData.getProjectedRetirementAge(),
+                            "https://imgur.com/wepzOX0", "https://www.voya.com/sites/all/themes/custom/voya_base_theme/social_logo.jpg");
                     shouldSessionEnd = false;
                     break;
                 case ACCOUNTACTIVITY:
                     userData = this.getUserData(request.getVoyaPIN());
                     DateFormat alexaFormat = new SimpleDateFormat("MM-dd-yyyy");
+
+                    VisualList list = new VisualListImpl("Recent transactions",
+                            "date range - " + alexaFormat.format(request.getStartDate().getTime()) + " to " + alexaFormat.format(request.getEndDate().getTime()),
+                            "", "",
+                            "https://imgur.com/wepzOX0.jpg", "");
+
                     List<String> recentTransactions = userData.getRecentTransactions(request.getStartDate(),
                             request.getEndDate());
                     if(recentTransactions.size() > 0) {
                         speech += "Here is your account activity from " + alexaFormat.format(request.getStartDate().getTime()) +
                                 " to " + alexaFormat.format(request.getEndDate().getTime()) +". ";
                         for(String item: recentTransactions) {
+                            list.addItem(item);
                             speech += item +". ";
+
                         }
                     }
                     else {
                         speech += "There are no transactions between " + alexaFormat.format(request.getStartDate().getTime()) +
                                 " and " + alexaFormat.format(request.getEndDate().getTime()) +". ";
                     }
+                    speech += "That's all the transactions. Is there anything else I can do to help?";
                     questionNo = 1;
                     userPin = request.getVoyaPIN();
                     shouldSessionEnd = false;
+                    display = list;
                     break;
                 case VIEWNOTIFICATIONS:
                     userData = this.getUserData(request.getVoyaPIN());
+                    //VisualList list1 = new VisualListImpl("Notifications", "", "", "", "", "");
+                    list = new VisualListImpl("Notifications","","","","https://imgur.com/wepzOX0.jpg", "");
                     if(userData.getNotifications().size() == 0) {
                         speech = "There are no notifications";
                         questionNo = 1;
@@ -316,12 +334,14 @@ public class VoyaControllerImpl implements VoyaController{
                         questionNo = 5;
                         notificationNumber = 1;
                         speech += userData.getNotifications().get(notificationNumber - 1).getText();
+                        list.addItem(userData.getNotifications().get(notificationNumber - 1).getText());
                         if(userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
                             questionNo = 6;
                         }
                         else {
                             while(! userData.getNotifications().get(notificationNumber - 1).isInteractive()) {
                                 speech += userData.getNotifications().get(notificationNumber - 1).getText() + ".\n";
+                                list.addItem(userData.getNotifications().get(notificationNumber - 1).getText());
                                 notificationNumber ++;
                                 if(notificationNumber > userData.getNotifications().size()) {
                                     speech += " That's all of the notifications, " +
@@ -331,6 +351,7 @@ public class VoyaControllerImpl implements VoyaController{
                         }
                     }
                     userPin = request.getVoyaPIN();
+                    display = list;
                     break;
                 case BALANCE:
                     userData = this.getUserData(request.getVoyaPIN());
@@ -372,7 +393,11 @@ public class VoyaControllerImpl implements VoyaController{
             speech = translator.translate(speech, request.getLocale());
             reprompt = translator.translate(speech, request.getLocale());
         }
-        return new VoyaResponseImpl(questionNo, userPin, speech, reprompt, shouldSessionEnd, notificationNumber);
+        VoyaResponse response =  new VoyaResponseImpl(questionNo, userPin, speech, reprompt, shouldSessionEnd, notificationNumber);
+        if(request.displaySupported() && display != null) {
+            response.setVisualDisplay(display);
+        }
+        return response;
     }
 
     private VoyaUserDataObject getUserData(int pin) throws IllegalArgumentException {
@@ -399,8 +424,6 @@ public class VoyaControllerImpl implements VoyaController{
         for(int i = 1; i < rows.size(); i ++) {
             Element row = rows.get(i);
             Elements cols = row.select("td");
-            System.out.println("Cols size: " + cols.size());
-            System.out.println("Rows size: " + rows.size());
             DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
             try {
                 GregorianCalendar calendar = new GregorianCalendar();
@@ -420,12 +443,12 @@ public class VoyaControllerImpl implements VoyaController{
 
 
 
-        VoyaNotification paperless = new VoyaNotificationImpl("We noticed you are recieving statments by mail, " +
+        VoyaNotification paperless = new VoyaNotificationImpl("We noticed you are recieving statements by mail, " +
                 "would you like to switch to paperless and recieve all statements online?", true);
-        VoyaNotification testNonInteractive = new VoyaNotificationImpl("Test non interactive notification", false);
+        //VoyaNotification testNonInteractive = new VoyaNotificationImpl("Test non interactive notification", false);
         List<VoyaNotification> notifications = new ArrayList<>();
         notifications.add(paperless);
-        notifications.add(testNonInteractive);
+        //notifications.add(testNonInteractive);
 
        VoyaUserDataObjectImpl result =  new VoyaUserDataObjectImpl("Srini", "Kunkalaguntla", 50000, "7-25-2018",
                 .12, .04);

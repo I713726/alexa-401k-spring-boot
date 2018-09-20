@@ -1,8 +1,11 @@
 package voya401k;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,6 +25,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         Calendar fromDate = new GregorianCalendar();
         Calendar toDate = new GregorianCalendar();
         VoyaIntentType intentType;
+        boolean hasDisplay;
         try{
             questionNo = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("questionNo");
         }
@@ -57,7 +61,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             catch(NumberFormatException e) {
                 voyaPIN = 0;
             }
-       }
+        }
         else {
             try {
                 voyaPIN = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("voyaPin");
@@ -105,14 +109,23 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             }
         }
 
+        if(jsonObject.getJSONObject("context").getJSONObject("System").getJSONObject("device")
+                .getJSONObject("supportedInterfaces").has("Display")) {
+            hasDisplay = true;
+        }
+        else {
+            hasDisplay = false;
+        }
+
         VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
         String locale = jsonObject.getJSONObject("request").getString("locale");
 
-        return new VoyaRequestImpl(questionNo, voyaPIN, requestType, locale, intentType, fromDate, toDate, notificationNumber);
+        return new VoyaRequestImpl(questionNo, voyaPIN, requestType, locale, intentType, fromDate,
+                toDate, notificationNumber, hasDisplay);
     }
 
     @Override
-    public String buildResponse(VoyaResponse response) {
+    public String buildResponse(VoyaResponse response, VoyaRequest request) {
         JSONObject outJson = new JSONObject();
         JsonStringEncoder encoder = new JsonStringEncoder();
         outJson.put("version", 1.0);
@@ -127,10 +140,142 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 .put("voyaPin", response.getUserPIN());
         outJson.getJSONObject("sessionAttributes").put("notificationNo", response.getNotificationNumber());
 
+        if(response.getVisualDisplay() != null && request.getVoyaPIN() != 0) {
+            outJson.getJSONObject("response").put("directives", new JSONArray().put(
+                    new JSONObject().put("template", new JSONObject()).put("type", "Display.RenderTemplate")));
 
+            JSONObject renderTemplateDirective = outJson.getJSONObject("response").getJSONArray("directives")
+                    .getJSONObject(0).getJSONObject("template");
+            switch(request.getIntent()) {
+                case VIEWNOTIFICATIONS:
+                    if(response.getVisualDisplay() instanceof VisualList) {
+                        VisualList display = (VisualList) response.getVisualDisplay();
+                        renderTemplateDirective.put("type", "ListTemplate1");
+                        //renderTemplateDirective.put("backgroundImage", response.getVisualDisplay().getBackgroundImageURL());
+                        renderTemplateDirective.put("title", response.getVisualDisplay().getTitle());
+                        renderTemplateDirective.put("listItems", new JSONArray());
+                        /*
+                        renderTemplateDirective.put("image", new JSONObject().put("contentDescription", "Voya Logo")
+                                .put("sources", new JSONArray().put(new JSONObject()
+                                        .put("url", response.getVisualDisplay().getBackgroundImageURL()))));
+                        */
+                        renderTemplateDirective.put("backgroundImage",
+                                new JSONObject().put("sources", new JSONArray().put(new JSONObject().put("url",
+                                        response.getVisualDisplay().getBackgroundImageURL()))));
+                        for(String listItem : display.getListItems()) {
+                            renderTemplateDirective.getJSONArray("listItems").put(
+                                    new JSONObject().put("textContent", new JSONObject().put("primaryText",
+                                            new JSONObject().put("text", "<font size=\"2\"  >" + listItem + "</font>")
+                                                    .put("type", "RichText")))
+                            );
+                        }
+                    }
+                    break;
+                case ACCOUNTACTIVITY:
+                    if(response.getVisualDisplay() instanceof VisualList) {
+                        VisualList display = (VisualList) response.getVisualDisplay();
+                        renderTemplateDirective.put("type", "ListTemplate1");
+                        //renderTemplateDirective.put("backgroundImage", response.getVisualDisplay().getBackgroundImageURL());
+                        renderTemplateDirective.put("title", response.getVisualDisplay().getTitle());
+                        renderTemplateDirective.put("listItems", new JSONArray());
+                        DateFormat alexaFormat = new SimpleDateFormat("MM/dd/yyyy");
+                        /*
+                        outJson.getJSONObject("response").getJSONArray("directives").getJSONObject(0)
+                                .put("backgroundImage", response.getVisualDisplay().getBackgroundImageURL());
+                        */
+                        renderTemplateDirective.put("backgroundImage", new JSONObject().put("contentDescription", "Voya Logo")
+                                .put("sources", new JSONArray().put(new JSONObject()
+                                        .put("url", response.getVisualDisplay().getBackgroundImageURL()))));
 
+                        if(display.getListItems().size() == 0) {
+                            renderTemplateDirective.getJSONArray("listItems").put(
+                                    new JSONObject().put("textContent", new JSONObject().put("primaryText",
+                                            new JSONObject().put("text", "<font size=\"2\">No transactions in the " +
+                                                    "specified range (" + alexaFormat.format(request.getStartDate()) + " to "
+                                                    + alexaFormat.format(request.getEndDate()) + ")</font>").put("type", "RichText")))
+                            );
+                        }
+                        for(String listItem : display.getListItems()) {
+                            renderTemplateDirective.getJSONArray("listItems").put(
+                                    new JSONObject().put("textContent", new JSONObject().put("primaryText",
+                                            new JSONObject().put("text", "<font size=\"2\">" + listItem + "</font>").put("type", "RichText")))
+                            );
+                        }
+                    }
+                    break;
+                case SUMMARY:
+                    renderTemplateDirective.put("type", "BodyTemplate2");
+                    renderTemplateDirective.put("image", new JSONObject().put("contentDescription", "Voya Logo")
+                            .put("sources", new JSONArray().put(new JSONObject()
+                                    .put("url", response.getVisualDisplay().getForegroundImageURL()))));
+                    renderTemplateDirective.put("backgroundImage", new JSONObject().put("contentDescription", "Voya Logo")
+                            .put("sources", new JSONArray().put(new JSONObject()
+                                    .put("url", response.getVisualDisplay().getBackgroundImageURL()))));
+                    renderTemplateDirective.put("title", response.getVisualDisplay().getTitle());
+                    renderTemplateDirective.put("textContent", new JSONObject()
+                            .put("primaryText", new JSONObject().put("text", response.getVisualDisplay().getPrimaryText())
+                                    .put("type", "PlainText"))
+                            .put("secondaryText", new JSONObject().put("text", response.getVisualDisplay().getSecondaryText())
+                                    .put("type", "PlainText"))
+                            .put("tertiaryText", new JSONObject().put("text", response.getVisualDisplay().getTertiaryText())
+                                    .put("type", "PlainText")));
+                    break;
+            }
 
+        }
+
+        System.out.println(outJson.toString());
         return outJson.toString();
+        /*
+        return "{\n" +
+                "  \"version\": \"1.0\",\n" +
+                "  \"sessionAttributes\": {\n" +
+                "    \"supportedHoroscopePeriods\": {\n" +
+                "      \"daily\": true,\n" +
+                "      \"weekly\": false,\n" +
+                "      \"monthly\": false\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"response\": {\n" +
+                "    \"card\": null,\n" +
+                "    \"outputSpeech\": {\n" +
+                "      \"type\": \"PlainText\",\n" +
+                "      \"text\": \"You are going to have a good day today.\"\n" +
+                "    },\n" +
+                "    \"reprompt\": {\n" +
+                "      \"outputSpeech\": {\n" +
+                "        \"type\": \"PlainText\",\n" +
+                "        \"text\": \"Anything else?\"\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"directives\": [\n" +
+                "      {\n" +
+                "        \"type\": \"Display.RenderTemplate\",\n" +
+                "        \"template\": {\n" +
+                "          \"type\": \"BodyTemplate1\",\n" +
+                "          \"token\": \"horoscope\",\n" +
+                "          \"title\": \"This is your horoscope\",\n" +
+                "          \"image\": {\n" +
+                "            \"contentDescription\": \"Aquarius\",\n" +
+                "            \"sources\": [\n" +
+                "              {\n" +
+                "                \"url\": \"https://example.com/resources/card-images/aquarius-symbol.png\"\n" +
+                "              }\n" +
+                "            ]\n" +
+                "          },\n" +
+                "          \"textContent\": {\n" +
+                "            \"primaryText\": {\n" +
+                "              \"type\": \"RichText\",\n" +
+                "              \"text\": \"You are going to have a <b>good day</b> today.\"\n" +
+                "            }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"shouldEndSession\": false\n" +
+                "  }\n" +
+                "}";
+                */
     }
 
     private VoyaRequestType getRequestType(String requestType) {

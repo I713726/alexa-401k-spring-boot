@@ -15,7 +15,7 @@ import java.util.GregorianCalendar;
 public class EchoShowRequestAndResponseBuilder extends AlexaRequestAndResponseBuilder {
 
     @Override
-    public String buildResponse(VoyaResponse response) {
+    public String buildResponse(VoyaResponse response, VoyaRequest request) {
         JSONObject outJson = new JSONObject();
         JsonStringEncoder encoder = new JsonStringEncoder();
         outJson.put("version", 1.0);
@@ -30,23 +30,28 @@ public class EchoShowRequestAndResponseBuilder extends AlexaRequestAndResponseBu
         outJson.getJSONObject("sessionAttributes").put("notificationNo", response.getNotificationNumber());
 
         //testing video play
-        /*
+
+        //outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
+
+
         outJson.getJSONObject("response").put("directives", new JSONArray().put(
-                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://drive.google.com/uc?export=download&id=0B5GHSc8KvSS8c2tTYWNSWm1LanM")
+                new JSONObject().put("type", "VideoApp.Launch").put("videoItem", new JSONObject().put("source", "https://demos.voyacdn.com/ease/myvoya/static/public/videos/Alex_off%20track-save%20more.mp4")
                 .put("metadata", new JSONObject().put("title", "retirement day video").put("subtitle", "subtitle")))));
 
-        */
 
+
+        /*
         outJson.getJSONObject("response").put("directives", new JSONArray().put(
-                new JSONObject().put("type", "BodyTemplate1").put("token", "t123").put("backButton", "hidden")
-                .put("backgroundImage", new JSONObject().put("contentDescription", "voyaLogo")
-                                                        .put("sources", new JSONArray().put(new JSONObject().put("url", "https://www.voya.com/sites/all/themes/custom/voya_base_theme/social_logo.jpg")))
+                new JSONObject().put("type", "Display.RenderTemplate").put(
+                        "template", new JSONObject().put("type", "BodyTemplate1").put("token", "t123").put("backButton", "hidden")
+                                .put("backgroundImage", new JSONObject().put("contentDescription", "voyaLogo")
+                                        .put("sources", new JSONArray().put(new JSONObject().put("url", "https://www.voya.com/sites/all/themes/custom/voya_base_theme/social_logo.jpg")))
+                                )
                 ).put("title", "Voya 401k").put("textContent", new JSONObject().put("primaryText", new JSONObject().put("text", "cardInfo").put("type", "PlainText")))
 
+
         ));
-
-
-
+        */
         return outJson.toString();
     }
 }

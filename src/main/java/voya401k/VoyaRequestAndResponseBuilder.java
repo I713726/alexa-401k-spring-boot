@@ -14,7 +14,8 @@ public interface VoyaRequestAndResponseBuilder {
     /**
      * This method takes a VoyaResponse object and uses it to create a JSON string to be sent to the virtual assistant.
      * @param response Response created by the VoyaController
+     * @param request The original request in case you need any data from it to form the response
      * @return JSON response for the virtual assistant (Alexa or Google Home)
      */
-    String buildResponse(VoyaResponse response);
+    String buildResponse(VoyaResponse response, VoyaRequest request);
 }

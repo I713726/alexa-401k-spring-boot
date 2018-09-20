@@ -58,4 +58,10 @@ public interface VoyaRequest {
      * @return
      */
     int getNotificationNumber();
+
+    /**
+     * Returns true if the device making the request supports visual display
+     * @return
+     */
+    boolean displaySupported();
 }

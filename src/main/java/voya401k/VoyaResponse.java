@@ -47,4 +47,17 @@ public interface VoyaResponse {
      * @return
      */
     int getNotificationNumber();
+
+    /**
+     * gives the response a visual display
+     */
+    void setVisualDisplay(VisualDisplay visualDisplay);
+
+    /**
+     * returns the visual display object, containing visual info for this response. If there is no visual
+     * display, this will return null
+     * TODO: maybe return something other than Null
+     * @return
+     */
+    VisualDisplay getVisualDisplay();
 }

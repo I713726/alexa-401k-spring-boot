@@ -13,10 +13,11 @@ public class VoyaRequestImpl implements VoyaRequest {
     Calendar startDate;
     Calendar endDate;
     int notificationNumber;
+    boolean displaySupported;
 
     public VoyaRequestImpl(int questionNo, int voyaPIN,
                            VoyaRequestType requestType, String locale, VoyaIntentType intentType, Calendar startDate,
-                           Calendar endDate, int notificationNumber){
+                           Calendar endDate, int notificationNumber, boolean displaySupported){
         this.questionNo = questionNo;
         this.voyaPIN = voyaPIN;
         this.requestType = requestType;
@@ -25,6 +26,7 @@ public class VoyaRequestImpl implements VoyaRequest {
         this.startDate = startDate;
         this.endDate = endDate;
         this.notificationNumber = notificationNumber;
+        this.displaySupported = displaySupported;
     }
 
     @Override
@@ -65,5 +67,10 @@ public class VoyaRequestImpl implements VoyaRequest {
     @Override
     public int getNotificationNumber() {
         return notificationNumber;
+    }
+
+    @Override
+    public boolean displaySupported() {
+        return this.displaySupported;
     }
 }

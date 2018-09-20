@@ -11,6 +11,7 @@ public class VoyaResponseImpl implements VoyaResponse {
     String reprompt;
     boolean shouldSessionEnd;
     int notificationNumber;
+    VisualDisplay display;
 
     public VoyaResponseImpl(int questionNumber, int userPIN, String speech, String reprompt, boolean shouldSessionEnd,
                             int notificationNumber) {
@@ -53,5 +54,13 @@ public class VoyaResponseImpl implements VoyaResponse {
         return notificationNumber;
     }
 
+    @Override
+    public void setVisualDisplay(VisualDisplay visualDisplay) {
+        this.display = visualDisplay;
+    }
 
+    @Override
+    public VisualDisplay getVisualDisplay() {
+        return this.display;
+    }
 }
